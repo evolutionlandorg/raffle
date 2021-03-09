@@ -8,7 +8,7 @@ contract RaffleTest is DSTest {
     Raffle raffle;
 
     function setUp() public {
-        raffle = new Raffle(address(0));
+        raffle = new Raffle();
     }
 
     function testFail_basic_sanity() public {

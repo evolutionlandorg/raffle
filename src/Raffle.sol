@@ -9,7 +9,7 @@ import "./interfaces/IERC721.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IERC223.sol";
 
-contract Raffle is DSStop, DSMath {
+contract Raffle is Initializable, DSStop, DSMath {
     event Join(uint256 indexed landId, address user, uint256 amount, bytes32 subAddr);
     event ChangeAmount(uint256 indexed landId, address user, uint256 amount);
     event ChangeSubAddr(uint256 indexed landId, address user, bytes32 subAddr);
