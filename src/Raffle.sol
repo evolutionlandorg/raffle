@@ -114,7 +114,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     @param _landId The land token id which to join
     @param _amount The new stake ring amount 
      */
-    function changeAmount(uint256 _landId,  uint256 _amount) stoppable duration public {
+    function changeAmount(uint256 _landId, uint256 _amount) stoppable duration public {
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
         Item storage item = lands[_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");

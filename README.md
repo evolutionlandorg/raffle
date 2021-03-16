@@ -6,22 +6,22 @@ Users can stake the land of the EVO, and any number of RINGs as reserves to part
 
 ### API
 
-#### `check(uint256 _landId)`
+#### `check(uint256)`
 Return if the `_landId` is valid
 
-#### `join(uint256 _landId, uint256 _amount, address _subAddr)`
+#### `join(uint256,uint256,address)`
 Submit the land and RINGs as reserves to join the event. 
 
-#### `changeAmount(uint256 _landId,  uint256 _amount)`
+#### `changeAmount(uint256,uint256)`
 Change the ring amount which joined the event.
 
-#### `changeSubAddr(uint256 _landId, address _subAddr)`
+#### `changeSubAddr(uint256,address)`
 Change the dvm address which use to receive new land.
 
-#### `exit(uint256 _landId)`
+#### `exit(uint256)`
 Exit the event
 
-#### `draw(uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s)`
+#### `draw(uint256,bool,bytes32,uint8,bytes32,bytes32)`
 Redeem prize after lottery
 
 ### [Lottery rule](./Lottery-en.md)
