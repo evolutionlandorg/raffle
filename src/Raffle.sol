@@ -38,8 +38,8 @@ contract Raffle is Initializable, DSStop, DSMath {
     // user raffle info
     struct Item {
         address user;       // user address
-        uint256 balance;    // user colleteral amount 
-        address subAddr;    // crab dvm address
+        uint256 balance;    // user stake amount 
+        address subAddr;    // crab dvm address for receiving new land
     }
 
 	ISettingsRegistry public registry;
@@ -86,7 +86,12 @@ contract Raffle is Initializable, DSStop, DSMath {
         return totalMiners == 0;
     }
 
-
+    /**
+    @notice This function is used to join Gold Rust event through ETH/ERC20 Tokens
+    @param _landId  The land token id which to join
+    @param _amount  The ring amount which to stake
+    @param _subAddr The dvm address for receiving the new land
+     */
     function join(uint256 _landId, uint256 _amount, address _subAddr) stoppable duration public {
         require(lands[_landId].user == address(0), "Raffle: NOT_EMPTY");
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
@@ -103,6 +108,12 @@ contract Raffle is Initializable, DSStop, DSMath {
         emit Join(_landId, msg.sender, _amount, _subAddr);
     }
 
+
+    /**
+    @notice This function is used to change the ring stake amount 
+    @param _landId The land token id which to join
+    @param _amount The new stake ring amount 
+     */
     function changeAmount(uint256 _landId,  uint256 _amount) stoppable duration public {
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
         Item storage item = lands[_landId];
@@ -120,6 +131,11 @@ contract Raffle is Initializable, DSStop, DSMath {
         emit ChangeAmount(_landId, item.user, item.balance);
     }
 
+    /**
+    @notice This function is used to change the dvm address   
+    @param _landId The land token id which to join
+    @param _amount The new stake ring amount 
+     */
     function changeSubAddr(uint256 _landId, address _subAddr) stoppable duration public {
         Item storage item = lands[_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
@@ -128,6 +144,10 @@ contract Raffle is Initializable, DSStop, DSMath {
         emit ChangeSubAddr(_landId, item.user, item.subAddr);
     }
 
+    /**
+    @notice This function is used to exit Gold Rush event
+    @param _landId The land token id which to join
+     */
     function exit(uint256 _landId) stoppable duration public {
         Item storage item = lands[_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
@@ -139,6 +159,10 @@ contract Raffle is Initializable, DSStop, DSMath {
         delete lands[_landId];
     }
 
+    // This function is used to redeem prize after lottery
+	// _hashmessage = hash("${address(this)}${networkId}${_landId}${_won}")
+	// _v, _r, _s are from supervisor's signature on _hashmessage
+	// while the _hashmessage is signed by supervisor
     function draw(uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable finished public {
 		require(supervisor == _verify(_hashmessage, _v, _r, _s), "Raffle: VERIFY_FAILED");
 		require(keccak256(abi.encodePacked(address(this), networkId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");

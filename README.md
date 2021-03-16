@@ -1,19 +1,28 @@
-# Raffle
+## Raffle
 
-摇号采用加权随机算法. 从不同权重的N个元素中随机选择一个，并使得总体选择结果是按照权重分布的。  
-假设4块土地A、B、C、D参与摇号, 抵押金额分别为1、2、3、4，随机结果中A:B:C:D的比例要为1:2:3:4。  
-累加每个土地的权重A(1)-B(3)-C(6)-D(10)，则4个元素的的权重管辖区间分别为(0,1]、(1,3]、(3,6]、(6,10]。  然后随机出一个(0,10]之间的随机数。落在哪个区间，则该区间的元素即为按权重命中的元素。    
-要选取 M 块土地, 则可以按上面的方法选取一块土地后, 将该土地从集合中去除, 再反复按上面的方法抽取剩余的土地。  
-随机数的选取为块的哈希, 假如最终开奖块是 B, 则从 B - M 个块开始抽取, 一共抽取 M 个块的哈希作为抽奖的随机数。    
-一次ropsten上的抽奖举例:  
-```
-假设4块土地A、B、C、D参与摇号, 抵押金额分别为1、2、3、4
-最终开奖块为10000
-第9998个块的哈希为: 0x09cc4bb3ab6bb019e6bdca3a79d07c8d72919cf561489ac9101e4217b3cb8131
-其对1e19求余加1为:0.094 RING 落在(0,1] 区间, 对应的土地A中奖,
-去除土地A后, B, C, D 区间分别为 (0,2] (2,5] (5,9]
-第9999个块的哈希为:
-0x9e552bad9996f391acea81a0d77556958e96314f897ed0abbb16d0d36a54668f
-其对9e18求余加1为:1.087 RING 落在(0,2] 区间, 对应的土地B中奖.
-抽奖完毕, 土地A和土地B中奖.
-```
+Gold Rush Event.  
+
+Users can stake the land of the EVO, and any number of RINGs as reserves to participate in the lottery of the New World. The more RINGs, the higher the probability of being selected. 
+
+### API
+
+#### `check(uint256 _landId)`
+Return if the `_landId` is valid
+
+#### `join(uint256 _landId, uint256 _amount, address _subAddr)`
+Submit the land and RINGs as reserves to join the event. 
+
+#### `changeAmount(uint256 _landId,  uint256 _amount)`
+Change the ring amount which joined the event.
+
+#### `changeSubAddr(uint256 _landId, address _subAddr)`
+Change the dvm address which use to receive new land.
+
+#### `exit(uint256 _landId)`
+Exit the event
+
+#### `draw(uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s)`
+Redeem prize after lottery
+
+### [Lottery rule](./Lottery-en.md)
+
