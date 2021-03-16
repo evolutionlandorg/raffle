@@ -2,7 +2,7 @@
 
 Gold Rush Event.  
 
-Users can stake the land of the EVO, and any number of RINGs as reserves to participate in the lottery of the New World. The more RINGs, the higher the probability of being selected. 
+Users can submit the land of the EVO, and any number of RINGs as reserves to participate in the lottery of the New World. The more RINGs, the higher the probability of being selected. 
 
 ### API
 
