@@ -14,18 +14,15 @@ contract Raffle is Initializable, DSStop, DSMath {
     event Exit(uint256 indexed landId, address user, uint256 amount);
     event Win(uint256 indexed landId, address user, uint256 amount, address subAddr);
     event Lose(uint256 indexed landId, address user, uint256 amount, address subAddr);
-	// 0x434f4e54524143545f4f424a4543545f4f574e45525348495000000000000000
-	bytes32 public constant CONTRACT_OBJECT_OWNERSHIP =
-		"CONTRACT_OBJECT_OWNERSHIP";
-	// 0x434f4e54524143545f52494e475f45524332305f544f4b454e00000000000000
-	bytes32 public constant CONTRACT_RING_ERC20_TOKEN =
-		"CONTRACT_RING_ERC20_TOKEN";
+    // 0x434f4e54524143545f4f424a4543545f4f574e45525348495000000000000000
+    bytes32 public constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
+    // 0x434f4e54524143545f52494e475f45524332305f544f4b454e00000000000000
+    bytes32 public constant CONTRACT_RING_ERC20_TOKEN = "CONTRACT_RING_ERC20_TOKEN";
     // 0x434f4e54524143545f4c414e445f5245534f5552434500000000000000000000
     bytes32 public constant CONTRACT_LAND_RESOURCE = "CONTRACT_LAND_RESOURCE";
     // 0x434f4e54524143545f524556454e55455f504f4f4c0000000000000000000000
     bytes32 public constant CONTRACT_REVENUE_POOL = "CONTRACT_REVENUE_POOL";
-	bytes4 private constant _SELECTOR_TRANSFERFROM =
-		bytes4(keccak256(bytes("transferFrom(address,address,uint256)")));
+    bytes4 private constant _SELECTOR_TRANSFERFROM = bytes4(keccak256(bytes("transferFrom(address,address,uint256)")));
     // Gold Rush begin from start block
     uint256 public constant startBlock = 0;
     // Gold Rush end before end block
@@ -38,7 +35,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     // user raffle info
     struct Item {
         address user;       // user address
-        uint256 balance;    // user stake amount 
+        uint256 balance;    // user submit amount 
         address subAddr;    // crab dvm address for receiving new land
     }
 
@@ -57,27 +54,18 @@ contract Raffle is Initializable, DSStop, DSMath {
        _;
     }
 
-	function initialize(address _registry, address _supervisor, uint256 _networkId) public initializer {
-		owner = msg.sender;
-		emit LogSetOwner(msg.sender);
-		registry = ISettingsRegistry(_registry);
+    function initialize(address _registry, address _supervisor, uint256 _networkId) public initializer {
+	owner = msg.sender;
+	emit LogSetOwner(msg.sender);
+	registry = ISettingsRegistry(_registry);
         supervisor = _supervisor;
         networkId = _networkId;
-	}
+    }
 
-	function _safeTransferFrom(
-		address token,
-		address from,
-		address to,
-		uint256 value
-	) private {
-		(bool success, bytes memory data) =
-			token.call(abi.encodeWithSelector(_SELECTOR_TRANSFERFROM, from, to, value)); // solhint-disable-line
-		require(
-			success && (data.length == 0 || abi.decode(data, (bool))),
-			"Furnace: TRANSFERFROM_FAILED"
-		);
-	}
+    function _safeTransferFrom(address token, address from, address to, uint256 value) private {
+	(bool success, bytes memory data) = token.call(abi.encodeWithSelector(_SELECTOR_TRANSFERFROM, from, to, value)); // solhint-disable-line
+	require(success && (data.length == 0 || abi.decode(data, (bool))), "Furnace: TRANSFERFROM_FAILED");
+    }
     
     // check the land is valid
     function check(uint256 _landId) view public returns (bool) {
@@ -89,7 +77,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     /**
     @notice This function is used to join Gold Rust event through ETH/ERC20 Tokens
     @param _landId  The land token id which to join
-    @param _amount  The ring amount which to stake
+    @param _amount  The ring amount which to submit
     @param _subAddr The dvm address for receiving the new land
      */
     function join(uint256 _landId, uint256 _amount, address _subAddr) stoppable duration public {
@@ -112,7 +100,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     /**
     @notice This function is used to change the ring stake amount 
     @param _landId The land token id which to join
-    @param _amount The new stake ring amount 
+    @param _amount The new submit ring amount 
      */
     function changeAmount(uint256 _landId, uint256 _amount) stoppable duration public {
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
@@ -134,7 +122,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     /**
     @notice This function is used to change the dvm address   
     @param _landId The land token id which to join
-    @param _amount The new stake ring amount 
+    @param _amount The new submit ring amount 
      */
     function changeSubAddr(uint256 _landId, address _subAddr) stoppable duration public {
         Item storage item = lands[_landId];
@@ -160,12 +148,12 @@ contract Raffle is Initializable, DSStop, DSMath {
     }
 
     // This function is used to redeem prize after lottery
-	// _hashmessage = hash("${address(this)}${networkId}${_landId}${_won}")
-	// _v, _r, _s are from supervisor's signature on _hashmessage
-	// while the _hashmessage is signed by supervisor
+    // _hashmessage = hash("${address(this)}${networkId}${_landId}${_won}")
+    // _v, _r, _s are from supervisor's signature on _hashmessage
+    // while the _hashmessage is signed by supervisor
     function draw(uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable finished public {
-		require(supervisor == _verify(_hashmessage, _v, _r, _s), "Raffle: VERIFY_FAILED");
-		require(keccak256(abi.encodePacked(address(this), networkId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
+	require(supervisor == _verify(_hashmessage, _v, _r, _s), "Raffle: VERIFY_FAILED");
+	require(keccak256(abi.encodePacked(address(this), networkId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
         Item storage item = lands[_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
@@ -183,20 +171,14 @@ contract Raffle is Initializable, DSStop, DSMath {
         }
     }
 
-	function changeSupervisor(address _newSupervisor) public auth {
-		supervisor = _newSupervisor;
-	}
+    function changeSupervisor(address _newSupervisor) public auth {
+	supervisor = _newSupervisor;
+    }
 
-	function _verify(
-		bytes32 _hashmessage,
-		uint8 _v,
-		bytes32 _r,
-		bytes32 _s
-	) internal pure returns (address) {
-		bytes memory prefix = "\x19EvolutionLand Signed Message:\n32";
-		bytes32 prefixedHash =
-			keccak256(abi.encodePacked(prefix, _hashmessage));
-		address signer = ecrecover(prefixedHash, _v, _r, _s);
-		return signer;
-	}
+    function _verify(bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
+	bytes memory prefix = "\x19EvolutionLand Signed Message:\n32";
+	bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, _hashmessage));
+	address signer = ecrecover(prefixedHash, _v, _r, _s);
+	return signer;
+    }
 }
