@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -e
+
+. $(PWD)/bin/init
+
+RAFFLE=$(dapp create src/Raffle.sol:Raffle)
+addAddress "RAFFLE" "$RAFFLE"
+echo >&2 "${0##*/}: info: Raffle created."
+
+# 1
+NETWORKID=$(seth --to-uint256 $(seth rpc net_version))
+calldata=$(seth calldata "initialize(address,address,uint256)" $SETTINGSREGISTRY $SUPERVISOR $NETWORKID)
+RAFFLE_PROXY=$(dapp create src/RaffleProxy.sol:RaffleProxy $RAFFLE $FURNACEPROXYADMIN $calldata)
+addAddress "RAFFLE_PROXY" "$RAFFLE_PROXY"
+echo >&2 "${0##*/}: info: RaffleProxy inited."
