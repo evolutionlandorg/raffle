@@ -8,7 +8,7 @@ import (
 
 	"github.com/emirpasic/gods/maps/treemap"
 	"github.com/emirpasic/gods/utils"
-	"github.com/evolutionlandorg/raffle/algorithm/raffle/comparator"
+	"github.com/evolutionlandorg/raffle/algorithm/comparator"
 )
 
 var Big0 = big.NewInt(0)
