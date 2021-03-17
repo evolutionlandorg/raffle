@@ -1,4 +1,6 @@
 /out
+/pkg
 .dapprc
 .sethrc
 .env
+

@@ -1,4 +1,4 @@
-module github.com/hujw77/raffle
+module github.com/evolutionlandorg/raffle
 
 go 1.15
 

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/emirpasic/gods/maps/treemap"
-	"github.com/hujw77/raffle/comparator"
+	"github.com/evolutionlandorg/raffle/algorithm/raffle/comparator"
 )
 
 func init() {
