@@ -1,4 +1,4 @@
-module github.com/evolutionlandorg/raffle
+module github.com/evolutionlandorg/raffle/algorithm
 
 go 1.15
 
