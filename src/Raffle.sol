@@ -6,6 +6,7 @@ import "zeppelin-solidity/proxy/Initializable.sol";
 import "./interfaces/ISettingsRegistry.sol";
 import "./interfaces/ILandResource.sol";
 import "./interfaces/IERC223.sol";
+import "./interfaces/IERC721.sol";
 
 contract Raffle is Initializable, DSStop, DSMath {
     event Join(uint256 indexed landId, address user, uint256 amount, address subAddr);
@@ -27,8 +28,10 @@ contract Raffle is Initializable, DSStop, DSMath {
     uint256 public constant startBlock = 0;
     // Gold Rush end before end block
     uint256 public constant endBlock = 9947228;
-    // Gold Rush lottery fininal block
+    // Gold Rush lottery final block
     uint256 public constant finalBlock = 10000000;
+    // Gold Rush lottery expire block     200000 ~ 1 month
+    uint256 public constant expireBlock = 10200000;
     // Join Gold Rush Event minimum RING amount
     uint256 public constant MINI_AMOUNT = 1 ether; 
 
@@ -49,22 +52,17 @@ contract Raffle is Initializable, DSStop, DSMath {
        _;
     }
 
-    modifier finished() {
-       require(block.number >= finalBlock, "Raffle: NOT_FINISH"); 
-       _;
-    }
-
     function initialize(address _registry, address _supervisor, uint256 _networkId) public initializer {
-	owner = msg.sender;
-	emit LogSetOwner(msg.sender);
-	registry = ISettingsRegistry(_registry);
+        owner = msg.sender;
+        emit LogSetOwner(msg.sender);
+        registry = ISettingsRegistry(_registry);
         supervisor = _supervisor;
         networkId = _networkId;
     }
 
     function _safeTransferFrom(address token, address from, address to, uint256 value) private {
-	(bool success, bytes memory data) = token.call(abi.encodeWithSelector(_SELECTOR_TRANSFERFROM, from, to, value)); // solhint-disable-line
-	require(success && (data.length == 0 || abi.decode(data, (bool))), "Furnace: TRANSFERFROM_FAILED");
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(_SELECTOR_TRANSFERFROM, from, to, value)); // solhint-disable-line
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "Raffle: TRANSFERFROM_FAILED");
     }
     
     // check the land is valid
@@ -76,17 +74,17 @@ contract Raffle is Initializable, DSStop, DSMath {
 
     /**
     @notice This function is used to join Gold Rust event through ETH/ERC20 Tokens
-    @param _landId  The land token id which to join
-    @param _amount  The ring amount which to submit
+    @param _landId The land token id which to join
+    @param _amount The ring amount which to submit
     @param _subAddr The dvm address for receiving the new land
      */
     function join(uint256 _landId, uint256 _amount, address _subAddr) stoppable duration public {
+        address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
+        require(msg.sender == IERC721(ownership).ownerOf(_landId), "Raffle: FORBIDDEN");
         require(lands[_landId].user == address(0), "Raffle: NOT_EMPTY");
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
         require(check(_landId), "Raffle: INVALID_LAND");
-        address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
-        _safeTransferFrom(ownership, msg.sender, address(this), _landId);
         _safeTransferFrom(ring, msg.sender, address(this), _amount);
         lands[_landId] = Item({
             user: msg.sender,
@@ -122,7 +120,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     /**
     @notice This function is used to change the dvm address   
     @param _landId The land token id which to join
-    @param _amount The new submit ring amount 
+    @param _subAddr The new submit dvm address 
      */
     function changeSubAddr(uint256 _landId, address _subAddr) stoppable duration public {
         Item storage item = lands[_landId];
@@ -139,9 +137,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     function exit(uint256 _landId) stoppable duration public {
         Item storage item = lands[_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
-        address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
-        _safeTransferFrom(ownership, address(this), msg.sender, _landId);
         _safeTransferFrom(ring, address(this), msg.sender, item.balance);
         emit Exit(_landId, item.user, item.balance);
         delete lands[_landId];
@@ -151,20 +147,22 @@ contract Raffle is Initializable, DSStop, DSMath {
     // _hashmessage = hash("${address(this)}${networkId}${_landId}${_won}")
     // _v, _r, _s are from supervisor's signature on _hashmessage
     // while the _hashmessage is signed by supervisor
-    function draw(uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable finished public {
-	require(supervisor == _verify(_hashmessage, _v, _r, _s), "Raffle: VERIFY_FAILED");
-	require(keccak256(abi.encodePacked(address(this), networkId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
+    function draw(uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable public {
+        require(supervisor == _verify(_hashmessage, _v, _r, _s), "Raffle: VERIFY_FAILED");
+        require(keccak256(abi.encodePacked(address(this), networkId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
         Item storage item = lands[_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
         if (_won) {
             //TODO:: check Data
+            require(block.number >= finalBlock && block.number < expireBlock, "Raffle: NOT_PRIZE"); 
+            address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
+            _safeTransferFrom(ownership, msg.sender, address(this), _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
             emit Win(_landId, item.user, item.balance, item.subAddr);
             delete lands[_landId];
         } else {
-            address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
-            _safeTransferFrom(ownership, address(this), msg.sender, _landId);
+            require(block.number >= finalBlock, "Raffle: NOT_PRIZE"); 
             _safeTransferFrom(ring, address(this), msg.sender, item.balance);
             emit Lose(_landId, item.user, item.balance, item.subAddr);
             delete lands[_landId];
@@ -172,13 +170,13 @@ contract Raffle is Initializable, DSStop, DSMath {
     }
 
     function changeSupervisor(address _newSupervisor) public auth {
-	supervisor = _newSupervisor;
+        supervisor = _newSupervisor;
     }
 
     function _verify(bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
-	bytes memory prefix = "\x19EvolutionLand Signed Message:\n32";
-	bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, _hashmessage));
-	address signer = ecrecover(prefixedHash, _v, _r, _s);
-	return signer;
+        bytes memory prefix = "\x19EvolutionLand Signed Message:\n32";
+        bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, _hashmessage));
+        address signer = ecrecover(prefixedHash, _v, _r, _s);
+        return signer;
     }
 }
