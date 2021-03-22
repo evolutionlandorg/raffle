@@ -164,7 +164,6 @@ contract Raffle is Initializable, DSStop, DSMath {
             delete lands[_landId];
         } else {
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
-            _safeTransferFrom(ownership, address(this), msg.sender, _landId);
             _safeTransferFrom(ring, address(this), msg.sender, item.balance);
             emit Lose(_landId, item.user, item.balance, item.subAddr);
             delete lands[_landId];
