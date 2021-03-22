@@ -15,4 +15,3 @@ RAFFLE_PROXY=$(dapp create src/RaffleProxy.sol:RaffleProxy $RAFFLE $FURNACEPROXY
 addAddress "RAFFLE_PROXY" "$RAFFLE_PROXY"
 echo >&2 "${0##*/}: info: RaffleProxy inited."
 
-
