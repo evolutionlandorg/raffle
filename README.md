@@ -9,7 +9,7 @@ Users can submit the land of the EVO, and any number of RINGs as reserves to par
 #### `check(uint256)`
 Return if the `_landId` is valid
 
-#### `join(uint256,uint256,address)`
+#### `join(uint256,uint256,address,uint256)`
 Submit the land and RINGs as reserves to join the event. 
 
 #### `changeAmount(uint256,uint256)`
