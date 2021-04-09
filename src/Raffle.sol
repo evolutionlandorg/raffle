@@ -86,7 +86,6 @@ contract Raffle is Initializable, DSStop, DSMath {
         require(msg.sender == IERC721(ownership).ownerOf(_landId), "Raffle: FORBIDDEN");
         require(lands[eventId][_landId].user == address(0), "Raffle: NOT_EMPTY");
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
-        require(check(_landId), "Raffle: INVALID_LAND");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
         _safeTransferFrom(ring, msg.sender, address(this), _amount);
         lands[eventId][_landId] = Item({
@@ -160,6 +159,7 @@ contract Raffle is Initializable, DSStop, DSMath {
             //TODO:: check Data
             require(block.number >= finalBlock && block.number < expireBlock, "Raffle: NOT_PRIZE"); 
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
+            require(check(_landId), "Raffle: INVALID_LAND");
             _safeTransferFrom(ownership, msg.sender, address(this), _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
             emit Win(eventId, _landId, item.user, item.balance, item.subAddr, networkId, _toChainId);

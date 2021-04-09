@@ -26,3 +26,12 @@ Redeem prize after lottery
 
 ### [Lottery rule](./Lottery-en.md)
 
+### Addresses
+
+#### Ropsten
+```json
+{
+  "RAFFLE_PROXY": "0x490453474CA3EEe0d16F7FD47e999071a3EAca21"
+}
+```
+
