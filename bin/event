@@ -5,10 +5,10 @@ set -e
 . $(PWD)/bin/init
 
 eventId=1
-startBlock=0
-endBlock=9947228
-finalBlock=10000000
-expireBlock=10200000
+startBlock=10000000
+endBlock=10020000
+finalBlock=10040000
+expireBlock=10600000
 seth send $RAFFLE_PROXY "setEvent(uint256,uint256,uint256,uint256,uint256)" $eventId $startBlock $endBlock $finalBlock $expireBlock
 
 

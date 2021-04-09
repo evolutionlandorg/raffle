@@ -134,7 +134,7 @@ contract Raffle is Initializable, DSStop, DSMath {
 
     /**
     @notice This function is used to exit Gold Rush event
-    @param _landId The land token id which to join
+    @param _landId The land token id which to exit
      */
     function exit(uint256 _landId) stoppable duration public {
         Item storage item = lands[eventId][_landId];
