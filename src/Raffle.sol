@@ -133,6 +133,17 @@ contract Raffle is Initializable, DSStop, DSMath {
     }
 
     /**
+    @notice This function is used to change the ring stake amount and dvm address   
+    @param _landId The land token id which to join
+    @param _amount The new submit ring amount 
+    @param _subAddr The new submit dvm address 
+     */
+    function change(uint256 _landId, uint256 _amount, address _subAddr) public {
+        changeAmount(_landId, _amount);
+        changeSubAddr(_landId, _subAddr);
+    }
+
+    /**
     @notice This function is used to exit Gold Rush event
     @param _landId The land token id which to exit
      */
