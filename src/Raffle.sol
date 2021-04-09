@@ -96,6 +96,13 @@ contract Raffle is Initializable, DSStop, DSMath {
         emit Join(eventId, _landId, msg.sender, _amount, _subAddr, networkId, _toChainId);
     }
 
+    function joins(uint256[] calldata _landIds, uint256[] calldata _amounts, address[] calldata _subAddrs, uint256 _toChainId) external {
+        require(_landIds.length == _amounts.length && _landIds.length == _subAddrs.length, "Raffle: INVALID_LENGTH");
+        for(uint256 i = 0; i < _landIds.length; i++) {
+            join(_landIds[i], _amounts[i], _subAddrs[i], _toChainId);
+        }
+    }
+
 
     /**
     @notice This function is used to change the ring stake amount 
