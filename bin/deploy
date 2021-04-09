@@ -9,7 +9,7 @@ addAddress "RAFFLE" "$RAFFLE"
 echo >&2 "${0##*/}: info: Raffle created."
 
 # 1
-NETWORKID=$(seth --to-uint256 $(seth rpc net_version))
+NETWORKID=$(seth --to-uint256 1)
 calldata=$(seth calldata "initialize(address,address,uint256)" $SETTINGSREGISTRY $SUPERVISOR $NETWORKID)
 RAFFLE_PROXY=$(dapp create src/RaffleProxy.sol:RaffleProxy $RAFFLE $FURNACEPROXYADMIN $calldata)
 addAddress "RAFFLE_PROXY" "$RAFFLE_PROXY"

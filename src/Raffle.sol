@@ -9,11 +9,11 @@ import "./interfaces/IERC223.sol";
 import "./interfaces/IERC721.sol";
 
 contract Raffle is Initializable, DSStop, DSMath {
-    event Join(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr, uint256 fromChainId, uint256 toChainId);
+    event Join(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr, uint256 fromLandId, uint256 toLandId);
     event ChangeAmount(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount);
     event ChangeSubAddr(uint256 indexed eventId, uint256 indexed landId, address user, address subAddr);
     event Exit(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount);
-    event Win(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr, uint256 fromChainId, uint256 toChainId);
+    event Win(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr, uint256 fromLandId, uint256 toLandId);
     event Lose(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr);
     // 0x434f4e54524143545f4f424a4543545f4f574e45525348495000000000000000
     bytes32 public constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
@@ -46,7 +46,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     uint256 public expireBlock;
     ISettingsRegistry public registry;
     address public supervisor;
-    uint256 public networkId;
+    uint256 public fromLandId;
     // EventID => LandID => Item
     mapping(uint256 => mapping(uint256 => Item)) public lands;
 
@@ -55,12 +55,12 @@ contract Raffle is Initializable, DSStop, DSMath {
        _;
     }
 
-    function initialize(address _registry, address _supervisor, uint256 _networkId) public initializer {
+    function initialize(address _registry, address _supervisor, uint256 _fromLandId) public initializer {
         owner = msg.sender;
         emit LogSetOwner(msg.sender);
         registry = ISettingsRegistry(_registry);
         supervisor = _supervisor;
-        networkId = _networkId;
+        fromLandId = _fromLandId;
     }
 
     function _safeTransferFrom(address token, address from, address to, uint256 value) private {
@@ -81,7 +81,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     @param _amount The ring amount which to submit
     @param _subAddr The dvm address for receiving the new land
      */
-    function join(uint256 _landId, uint256 _amount, address _subAddr, uint256 _toChainId) stoppable duration public {
+    function join(uint256 _landId, uint256 _amount, address _subAddr, uint256 _toLandId) stoppable duration public {
         address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
         require(msg.sender == IERC721(ownership).ownerOf(_landId), "Raffle: FORBIDDEN");
         require(lands[eventId][_landId].user == address(0), "Raffle: NOT_EMPTY");
@@ -93,13 +93,13 @@ contract Raffle is Initializable, DSStop, DSMath {
             balance: _amount,
             subAddr: _subAddr
         });
-        emit Join(eventId, _landId, msg.sender, _amount, _subAddr, networkId, _toChainId);
+        emit Join(eventId, _landId, msg.sender, _amount, _subAddr, fromLandId, _toLandId);
     }
 
-    function joins(uint256[] calldata _landIds, uint256[] calldata _amounts, address[] calldata _subAddrs, uint256 _toChainId) external {
+    function joins(uint256[] calldata _landIds, uint256[] calldata _amounts, address[] calldata _subAddrs, uint256 _toLandId) external {
         require(_landIds.length == _amounts.length && _landIds.length == _subAddrs.length, "Raffle: INVALID_LENGTH");
         for(uint256 i = 0; i < _landIds.length; i++) {
-            join(_landIds[i], _amounts[i], _subAddrs[i], _toChainId);
+            join(_landIds[i], _amounts[i], _subAddrs[i], _toLandId);
         }
     }
 
@@ -164,12 +164,12 @@ contract Raffle is Initializable, DSStop, DSMath {
     }
 
     // This function is used to redeem prize after lottery
-    // _hashmessage = hash("${address(this)}${fromChainId}${toChainId}${eventId}${_landId}${_won}")
+    // _hashmessage = hash("${address(this)}${fromLandId}${toLandId}${eventId}${_landId}${_won}")
     // _v, _r, _s are from supervisor's signature on _hashmessage
     // while the _hashmessage is signed by supervisor
-    function draw(uint256 _landId, bool _won, uint256 _toChainId, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable public {
+    function draw(uint256 _landId, bool _won, uint256 _toLandId, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable public {
         require(supervisor == _verify(_hashmessage, _v, _r, _s), "Raffle: VERIFY_FAILED");
-        require(keccak256(abi.encodePacked(address(this), networkId, _toChainId, eventId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
+        require(keccak256(abi.encodePacked(address(this), fromLandId, _toLandId, eventId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
         Item storage item = lands[eventId][_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
@@ -180,7 +180,7 @@ contract Raffle is Initializable, DSStop, DSMath {
             require(check(_landId), "Raffle: INVALID_LAND");
             _safeTransferFrom(ownership, msg.sender, address(this), _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
-            emit Win(eventId, _landId, item.user, item.balance, item.subAddr, networkId, _toChainId);
+            emit Win(eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, _toLandId);
             delete lands[eventId][_landId];
         } else {
             require(block.number >= finalBlock, "Raffle: NOT_PRIZE"); 
