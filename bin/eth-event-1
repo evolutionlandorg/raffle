@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+
+. $(PWD)/bin/init
+
+eventId=1
+toLandId=3
+startBlock=10000000
+endBlock=10020000
+finalBlock=10040000
+expireBlock=10600000
+seth send $RAFFLE_PROXY "setEvent(uint256,uint256,uint256,uint256,uint256,uint256)" $eventId $toLandId $startBlock $endBlock $finalBlock $expireBlock
+
+

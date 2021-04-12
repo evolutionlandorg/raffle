@@ -50,6 +50,8 @@ contract Raffle is Initializable, DSStop, DSMath {
     // EventID => LandID => Item
     mapping(uint256 => mapping(uint256 => Item)) public lands;
 
+    uint256 public toLandId;
+
     modifier duration() {
        require(block.number >= startBlock && block.number < endBlock, "Raffle: NOT_DURATION"); 
        _;
@@ -81,7 +83,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     @param _amount The ring amount which to submit
     @param _subAddr The dvm address for receiving the new land
      */
-    function join(uint256 _landId, uint256 _amount, address _subAddr, uint256 _toLandId) stoppable duration public {
+    function join(uint256 _landId, uint256 _amount, address _subAddr) stoppable duration public {
         address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
         require(msg.sender == IERC721(ownership).ownerOf(_landId), "Raffle: FORBIDDEN");
         require(lands[eventId][_landId].user == address(0), "Raffle: NOT_EMPTY");
@@ -93,13 +95,13 @@ contract Raffle is Initializable, DSStop, DSMath {
             balance: _amount,
             subAddr: _subAddr
         });
-        emit Join(eventId, _landId, msg.sender, _amount, _subAddr, fromLandId, _toLandId);
+        emit Join(eventId, _landId, msg.sender, _amount, _subAddr, fromLandId, toLandId);
     }
 
-    function joins(uint256[] calldata _landIds, uint256[] calldata _amounts, address[] calldata _subAddrs, uint256 _toLandId) external {
+    function joins(uint256[] calldata _landIds, uint256[] calldata _amounts, address[] calldata _subAddrs) external {
         require(_landIds.length == _amounts.length && _landIds.length == _subAddrs.length, "Raffle: INVALID_LENGTH");
         for(uint256 i = 0; i < _landIds.length; i++) {
-            join(_landIds[i], _amounts[i], _subAddrs[i], _toLandId);
+            join(_landIds[i], _amounts[i], _subAddrs[i]);
         }
     }
 
@@ -167,9 +169,9 @@ contract Raffle is Initializable, DSStop, DSMath {
     // _hashmessage = hash("${address(this)}${fromLandId}${toLandId}${eventId}${_landId}${_won}")
     // _v, _r, _s are from supervisor's signature on _hashmessage
     // while the _hashmessage is signed by supervisor
-    function draw(uint256 _landId, bool _won, uint256 _toLandId, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable public {
+    function draw(uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable public {
         require(supervisor == _verify(_hashmessage, _v, _r, _s), "Raffle: VERIFY_FAILED");
-        require(keccak256(abi.encodePacked(address(this), fromLandId, _toLandId, eventId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
+        require(keccak256(abi.encodePacked(address(this), fromLandId, toLandId, eventId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
         Item storage item = lands[eventId][_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
@@ -180,7 +182,7 @@ contract Raffle is Initializable, DSStop, DSMath {
             require(check(_landId), "Raffle: INVALID_LAND");
             _safeTransferFrom(ownership, msg.sender, address(this), _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
-            emit Win(eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, _toLandId);
+            emit Win(eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, toLandId);
             delete lands[eventId][_landId];
         } else {
             require(block.number >= finalBlock, "Raffle: NOT_PRIZE"); 
@@ -194,8 +196,9 @@ contract Raffle is Initializable, DSStop, DSMath {
         supervisor = _newSupervisor;
     }
 
-    function setEvent(uint256 _eventId, uint256 _start, uint256 _end, uint256 _final, uint256 _expire) public auth {
+    function setEvent(uint256 _eventId, uint256 _toLandId, uint256 _start, uint256 _end, uint256 _final, uint256 _expire) public auth {
         eventId = _eventId;
+        toLandId = _toLandId;
         startBlock = _start;
         endBlock = _end;
         finalBlock = _final;
