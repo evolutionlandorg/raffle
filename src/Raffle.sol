@@ -2,13 +2,12 @@ pragma solidity ^0.6.7;
 
 import "ds-math/math.sol";
 import "ds-stop/stop.sol";
-import "zeppelin-solidity/proxy/Initializable.sol";
 import "./interfaces/ISettingsRegistry.sol";
 import "./interfaces/ILandResource.sol";
 import "./interfaces/IERC223.sol";
 import "./interfaces/IERC721.sol";
 
-contract Raffle is Initializable, DSStop, DSMath {
+contract Raffle is DSStop, DSMath {
     event Join(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr, uint256 fromLandId, uint256 toLandId);
     event ChangeAmount(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount);
     event ChangeSubAddr(uint256 indexed eventId, uint256 indexed landId, address user, address subAddr);
@@ -25,7 +24,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     bytes32 public constant CONTRACT_REVENUE_POOL = "CONTRACT_REVENUE_POOL";
     bytes4 private constant _SELECTOR_TRANSFERFROM = bytes4(keccak256(bytes("transferFrom(address,address,uint256)")));
     // Join Gold Rush Event minimum RING amount
-    uint256 public constant MINI_AMOUNT = 1 ether; 
+    uint256 public constant MINI_AMOUNT = 1e18; 
 
     // user raffle info
     struct Item {
@@ -57,9 +56,7 @@ contract Raffle is Initializable, DSStop, DSMath {
        _;
     }
 
-    function initialize(address _registry, address _supervisor, uint256 _fromLandId) public initializer {
-        owner = msg.sender;
-        emit LogSetOwner(msg.sender);
+    constructor(address _registry, address _supervisor, uint256 _fromLandId) public {
         registry = ISettingsRegistry(_registry);
         supervisor = _supervisor;
         fromLandId = _fromLandId;

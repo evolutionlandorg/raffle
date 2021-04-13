@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-set -e
-
-. $(PWD)/bin/init
-
-RAFFLE=$(dapp create src/Raffle.sol:Raffle)
-seth send $FURNACEPROXYADMIN "upgrade(address,address)" $RAFFLE_PROXY $RAFFLE
-addAddress "RAFFLE" "$RAFFLE"
