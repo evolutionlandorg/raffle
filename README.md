@@ -38,6 +38,9 @@ Redeem prize after lottery
 #### Tron shasta
 ```json
 {
-  "Raffle": "TWu1aNs63rhviL7onxtB8GpxYEkWoyWWx4"
+  "Raffle": {
+  	"base58": "TWu1aNs63rhviL7onxtB8GpxYEkWoyWWx4",
+	"hex": "41E58F70A751441F67B37F48AD7111710B7FEA2157"
+  } 
 }
 ```
