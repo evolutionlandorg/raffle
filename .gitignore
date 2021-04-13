@@ -1,6 +1,10 @@
 /out
 /pkg
+build
+node_modules
+package-lock.json
 .dapprc
 .sethrc
 .env
+
 
