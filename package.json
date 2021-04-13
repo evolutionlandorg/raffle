@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "tronbox compile",
-    "deploy:shasta": "source .env && tronbox migrate --reset --network shasta"
+    "deploy:shasta": "source .env && tronbox migrate --reset --network shasta",
+    "event1": "source .env && node scripts/raffle_event_1.js"
   },
   "dependencies": {
     "tronweb": "^3.2.6"
