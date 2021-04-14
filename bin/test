@@ -16,23 +16,23 @@ seth call $RAFFLE_PROXY "check(uint256)(bool)" $LAND2
 # small=$(seth --to-wei 0.9 ether)
 # seth call $RAFFLE_PROXY "join(uint256,uint256,address)" $LAND2 $small $AUTH
 
-eventId=$(seth --to-uint256 1)
+eventId=$(seth --to-uint256 2)
 seth call $RAFFLE_PROXY "lands(uint256,uint256)(address,uint256,address)" $eventId $LAND2 
 
 amount=$(seth --to-wei 1 ether)
-seth send $RAFFLE_PROXY "join(uint256,uint256,address)" $LAND2 $amount $AUTH 
+seth send $RAFFLE_PROXY "join(uint256,uint256,uint256,address)" $eventId $LAND2 $amount $AUTH 
 
 seth call $RAFFLE_PROXY "lands(uint256,uint256)(address,uint256,address)" $eventId $LAND2 
 
 change=$(seth --to-wei 1.1 ether)
-seth send $RAFFLE_PROXY "changeAmount(uint256,uint256)" $LAND2 $change 
+seth send $RAFFLE_PROXY "changeAmount(uint256,uint256,uint256)" $eventId $LAND2 $change 
 
 seth call $RAFFLE_PROXY "lands(uint256,uint256)(address,uint256,address)" $eventId $LAND2 
 
-seth send $RAFFLE_PROXY "changeSubAddr(uint256,address)" $LAND2 $SUPERVISOR
+seth send $RAFFLE_PROXY "changeSubAddr(uint256,uint256,address)" $eventId $LAND2 $SUPERVISOR
 
 seth call $RAFFLE_PROXY "lands(uint256,uint256)(address,uint256,address)" $eventId $LAND2 
 
-seth send $RAFFLE_PROXY "exit(uint256)" $LAND2
+seth send $RAFFLE_PROXY "exit(uint256,uint256)" $eventId $LAND2
 
 seth call $RAFFLE_PROXY "lands(uint256,uint256)(address,uint256,address)" $eventId $LAND2 
