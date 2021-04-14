@@ -33,30 +33,38 @@ contract Raffle is DSStop, DSMath {
         address subAddr;    // crab dvm address for receiving new land
     }
 
-    // Gold Rush Event ID
-    uint256 public eventId;
+    struct Conf {
+        uint256 startBlock;
+        // Gold Rush end before end block
+        uint256 endBlock;
+        // Gold Rush lottery final block
+        uint256 finalBlock;
+        // Gold Rush lottery expire block     200000 ~ 1 month
+        uint256 expireBlock;
+        // Gold Rush to land id 
+        uint256 toLandId;
+    }
+
     // Gold Rush begin from start block
-    uint256 public startBlock;
-    // Gold Rush end before end block
-    uint256 public endBlock;
-    // Gold Rush lottery final block
-    uint256 public finalBlock;
-    // Gold Rush lottery expire block     200000 ~ 1 month
-    uint256 public expireBlock;
     ISettingsRegistry public registry;
     address public supervisor;
+    // Gold Rush from land id 
     uint256 public fromLandId;
+    // EventID => Conf
+    mapping(uint256 => Conf) public events;
     // EventID => LandID => Item
     mapping(uint256 => mapping(uint256 => Item)) public lands;
 
-    uint256 public toLandId;
 
-    modifier duration() {
-       require(block.number >= startBlock && block.number < endBlock, "Raffle: NOT_DURATION"); 
+    modifier duration(uint256 _eventId) {
+        Conf storage conf = events[_eventId];
+       require(block.number >= conf.startBlock && block.number < conf.endBlock, "Raffle: NOT_DURATION"); 
        _;
     }
 
     constructor(address _registry, address _supervisor, uint256 _fromLandId) public {
+        owner = msg.sender;
+        emit LogSetOwner(msg.sender);
         registry = ISettingsRegistry(_registry);
         supervisor = _supervisor;
         fromLandId = _fromLandId;
@@ -76,41 +84,45 @@ contract Raffle is DSStop, DSMath {
 
     /**
     @notice This function is used to join Gold Rust event through ETH/ERC20 Tokens
-    @param _landId The land token id which to join
-    @param _amount The ring amount which to submit
+    @param _eventId event id which to join
+    @param _landId  The land token id which to join
+    @param _amount  The ring amount which to submit
     @param _subAddr The dvm address for receiving the new land
      */
-    function join(uint256 _landId, uint256 _amount, address _subAddr) stoppable duration public {
+    function join(uint256 _eventId, uint256 _landId, uint256 _amount, address _subAddr) stoppable duration(_eventId) public {
         address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
         require(msg.sender == IERC721(ownership).ownerOf(_landId), "Raffle: FORBIDDEN");
-        require(lands[eventId][_landId].user == address(0), "Raffle: NOT_EMPTY");
+        require(lands[_eventId][_landId].user == address(0), "Raffle: NOT_EMPTY");
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
-        address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
-        _safeTransferFrom(ring, msg.sender, address(this), _amount);
-        lands[eventId][_landId] = Item({
+        {
+            address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
+            _safeTransferFrom(ring, msg.sender, address(this), _amount);
+        }
+        lands[_eventId][_landId] = Item({
             user: msg.sender,
             balance: _amount,
             subAddr: _subAddr
         });
-        emit Join(eventId, _landId, msg.sender, _amount, _subAddr, fromLandId, toLandId);
+        emit Join(_eventId, _landId, msg.sender, _amount, _subAddr, fromLandId, events[_eventId].toLandId);
     }
 
-    function joins(uint256[] calldata _landIds, uint256[] calldata _amounts, address[] calldata _subAddrs) external {
+    function joins(uint256 _eventId, uint256[] calldata _landIds, uint256[] calldata _amounts, address[] calldata _subAddrs) external {
         require(_landIds.length == _amounts.length && _landIds.length == _subAddrs.length, "Raffle: INVALID_LENGTH");
         for(uint256 i = 0; i < _landIds.length; i++) {
-            join(_landIds[i], _amounts[i], _subAddrs[i]);
+            join(_eventId, _landIds[i], _amounts[i], _subAddrs[i]);
         }
     }
 
 
     /**
     @notice This function is used to change the ring stake amount 
-    @param _landId The land token id which to join
-    @param _amount The new submit ring amount 
+    @param _eventId event id which to join
+    @param _landId  The land token id which to join
+    @param _amount  The new submit ring amount 
      */
-    function changeAmount(uint256 _landId, uint256 _amount) stoppable duration public {
+    function changeAmount(uint256 _eventId, uint256 _landId, uint256 _amount) stoppable duration(_eventId) public {
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
-        Item storage item = lands[eventId][_landId];
+        Item storage item = lands[_eventId][_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         require(item.balance != _amount, "Raffle: SAME_AMOUNT");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
@@ -122,70 +134,74 @@ contract Raffle is DSStop, DSMath {
             _safeTransferFrom(ring, address(this), msg.sender, diff);
         }
         item.balance = _amount;
-        emit ChangeAmount(eventId, _landId, item.user, item.balance);
+        emit ChangeAmount(_eventId, _landId, item.user, item.balance);
     }
 
     /**
     @notice This function is used to change the dvm address   
-    @param _landId The land token id which to join
+    @param _eventId event id which to join
+    @param _landId  The land token id which to join
     @param _subAddr The new submit dvm address 
      */
-    function changeSubAddr(uint256 _landId, address _subAddr) stoppable duration public {
-        Item storage item = lands[eventId][_landId];
+    function changeSubAddr(uint256 _eventId, uint256 _landId, address _subAddr) stoppable duration(_eventId) public {
+        Item storage item = lands[_eventId][_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         require(item.subAddr != _subAddr, "Raffle: SAME_SUBADDR");
         item.subAddr = _subAddr;
-        emit ChangeSubAddr(eventId, _landId, item.user, item.subAddr);
+        emit ChangeSubAddr(_eventId, _landId, item.user, item.subAddr);
     }
 
     /**
     @notice This function is used to change the ring stake amount and dvm address   
-    @param _landId The land token id which to join
-    @param _amount The new submit ring amount 
+    @param _eventId event id which to join
+    @param _landId  The land token id which to join
+    @param _amount  The new submit ring amount 
     @param _subAddr The new submit dvm address 
      */
-    function change(uint256 _landId, uint256 _amount, address _subAddr) public {
-        changeAmount(_landId, _amount);
-        changeSubAddr(_landId, _subAddr);
+    function change(uint256 _eventId, uint256 _landId, uint256 _amount, address _subAddr) public {
+        changeAmount(_eventId, _landId, _amount);
+        changeSubAddr(_eventId, _landId, _subAddr);
     }
 
     /**
     @notice This function is used to exit Gold Rush event
-    @param _landId The land token id which to exit
+    @param _eventId event id which to join
+    @param _landId  The land token id which to exit
      */
-    function exit(uint256 _landId) stoppable duration public {
-        Item storage item = lands[eventId][_landId];
+    function exit(uint256 _eventId, uint256 _landId) stoppable duration(_eventId) public {
+        Item storage item = lands[_eventId][_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
         _safeTransferFrom(ring, address(this), msg.sender, item.balance);
-        emit Exit(eventId, _landId, item.user, item.balance);
-        delete lands[eventId][_landId];
+        emit Exit(_eventId, _landId, item.user, item.balance);
+        delete lands[_eventId][_landId];
     }
 
     // This function is used to redeem prize after lottery
-    // _hashmessage = hash("${address(this)}${fromLandId}${toLandId}${eventId}${_landId}${_won}")
+    // _hashmessage = hash("${address(this)}${fromLandId}${toLandId}${_eventId}${_landId}${_won}")
     // _v, _r, _s are from supervisor's signature on _hashmessage
     // while the _hashmessage is signed by supervisor
-    function draw(uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable public {
+    function draw(uint256 _eventId, uint256 _landId, bool _won, bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) stoppable public {
+        Conf storage conf = events[_eventId];
         require(supervisor == _verify(_hashmessage, _v, _r, _s), "Raffle: VERIFY_FAILED");
-        require(keccak256(abi.encodePacked(address(this), fromLandId, toLandId, eventId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
-        Item storage item = lands[eventId][_landId];
+        require(keccak256(abi.encodePacked(address(this), fromLandId, conf.toLandId, _eventId, _landId, _won)) == _hashmessage, "Raffle: HASH_INVAILD");
+        Item storage item = lands[_eventId][_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
         if (_won) {
             //TODO:: check Data
-            require(block.number >= finalBlock && block.number < expireBlock, "Raffle: NOT_PRIZE"); 
+            require(block.number >= conf.finalBlock && block.number < conf.expireBlock, "Raffle: NOT_PRIZE OR EXPIRATION"); 
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
             require(check(_landId), "Raffle: INVALID_LAND");
             _safeTransferFrom(ownership, msg.sender, address(this), _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
-            emit Win(eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, toLandId);
-            delete lands[eventId][_landId];
+            emit Win(_eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, conf.toLandId);
+            delete lands[_eventId][_landId];
         } else {
-            require(block.number >= finalBlock, "Raffle: NOT_PRIZE"); 
+            require(block.number >= conf.finalBlock, "Raffle: NOT_PRIZE"); 
             _safeTransferFrom(ring, address(this), msg.sender, item.balance);
-            emit Lose(eventId, _landId, item.user, item.balance, item.subAddr);
-            delete lands[eventId][_landId];
+            emit Lose(_eventId, _landId, item.user, item.balance, item.subAddr);
+            delete lands[_eventId][_landId];
         }
     }
 
@@ -194,12 +210,13 @@ contract Raffle is DSStop, DSMath {
     }
 
     function setEvent(uint256 _eventId, uint256 _toLandId, uint256 _start, uint256 _end, uint256 _final, uint256 _expire) public auth {
-        eventId = _eventId;
-        toLandId = _toLandId;
-        startBlock = _start;
-        endBlock = _end;
-        finalBlock = _final;
-        expireBlock = _expire;
+        events[_eventId] = Conf({
+            startBlock: _start,
+            endBlock: _end,
+            finalBlock: _final,
+            expireBlock: _expire,
+            toLandId: _toLandId
+        });
     }
 
     function _verify(bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
