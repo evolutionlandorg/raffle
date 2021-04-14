@@ -20,8 +20,7 @@ eventId=$(seth --to-uint256 1)
 seth call $RAFFLE_PROXY "lands(uint256,uint256)(address,uint256,address)" $eventId $LAND2 
 
 amount=$(seth --to-wei 1 ether)
-toChainId=$(seth --to-uint256 3)
-seth send $RAFFLE_PROXY "join(uint256,uint256,address,uint256)" $LAND2 $amount $AUTH $toChainId
+seth send $RAFFLE_PROXY "join(uint256,uint256,address)" $LAND2 $amount $AUTH 
 
 seth call $RAFFLE_PROXY "lands(uint256,uint256)(address,uint256,address)" $eventId $LAND2 
 
