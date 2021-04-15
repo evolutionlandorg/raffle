@@ -35,13 +35,14 @@ contract Raffle is Initializable, DSStop, DSMath {
     }
 
     struct Conf {
-        uint256 startBlock;
-        // Gold Rush end before end block
-        uint256 endBlock;
-        // Gold Rush lottery final block
-        uint256 finalBlock;
-        // Gold Rush lottery expire block     200000 ~ 1 month
-        uint256 expireBlock;
+        // Gold Rush start time 
+        uint256 startTime;
+        // Gold Rush end time 
+        uint256 endTime;
+        // Gold Rush lottery final time 
+        uint256 finalTime;
+        // Gold Rush lottery expire time 
+        uint256 expireTime;
         // Gold Rush to land id 
         uint256 toLandId;
     }
@@ -59,7 +60,7 @@ contract Raffle is Initializable, DSStop, DSMath {
 
     modifier duration(uint256 _eventId) {
         Conf storage conf = events[_eventId];
-       require(block.number >= conf.startBlock && block.number < conf.endBlock, "Raffle: NOT_DURATION"); 
+       require(block.number >= conf.startTime && block.number < conf.endTime, "Raffle: NOT_DURATION"); 
        _;
     }
 
@@ -191,7 +192,7 @@ contract Raffle is Initializable, DSStop, DSMath {
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
         if (_won) {
             //TODO:: check Data
-            require(block.number >= conf.finalBlock && block.number < conf.expireBlock, "Raffle: NOT_PRIZE OR EXPIRATION"); 
+            require(block.number >= conf.finalTime && block.number < conf.expireTime, "Raffle: NOT_PRIZE OR EXPIRATION"); 
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
             require(check(_landId), "Raffle: INVALID_LAND");
             _safeTransferFrom(ownership, msg.sender, address(this), _landId);
@@ -199,7 +200,7 @@ contract Raffle is Initializable, DSStop, DSMath {
             emit Win(_eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, conf.toLandId);
             delete lands[_eventId][_landId];
         } else {
-            require(block.number >= conf.finalBlock, "Raffle: NOT_PRIZE"); 
+            require(block.number >= conf.finalTime, "Raffle: NOT_PRIZE"); 
             _safeTransferFrom(ring, address(this), msg.sender, item.balance);
             emit Lose(_eventId, _landId, item.user, item.balance, item.subAddr);
             delete lands[_eventId][_landId];
@@ -212,10 +213,10 @@ contract Raffle is Initializable, DSStop, DSMath {
 
     function setEvent(uint256 _eventId, uint256 _toLandId, uint256 _start, uint256 _end, uint256 _final, uint256 _expire) public auth {
         events[_eventId] = Conf({
-            startBlock: _start,
-            endBlock: _end,
-            finalBlock: _final,
-            expireBlock: _expire,
+            startTime: _start,
+            endTime: _end,
+            finalTime: _final,
+            expireTime: _expire,
             toLandId: _toLandId
         });
     }
