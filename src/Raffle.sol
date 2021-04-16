@@ -60,7 +60,7 @@ contract Raffle is Initializable, DSStop, DSMath {
 
     modifier duration(uint256 _eventId) {
         Conf storage conf = events[_eventId];
-       require(block.number >= conf.startTime && block.number < conf.endTime, "Raffle: NOT_DURATION"); 
+       require(block.timestamp >= conf.startTime && block.timestamp < conf.endTime, "Raffle: NOT_DURATION"); 
        _;
     }
 
@@ -192,15 +192,16 @@ contract Raffle is Initializable, DSStop, DSMath {
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
         if (_won) {
             //TODO:: check Data
-            require(block.number >= conf.finalTime && block.number < conf.expireTime, "Raffle: NOT_PRIZE OR EXPIRATION"); 
+            require(block.timestamp >= conf.finalTime && block.timestamp < conf.expireTime, "Raffle: NOT_PRIZE OR EXPIRATION"); 
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
             require(check(_landId), "Raffle: INVALID_LAND");
-            _safeTransferFrom(ownership, msg.sender, address(this), _landId);
+            // return land to eve (genesisHolder)
+            _safeTransferFrom(ownership, msg.sender, 0xfE3EE13c28830F7F91Bbb62305D3B616e49998EC, _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
             emit Win(_eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, conf.toLandId);
             delete lands[_eventId][_landId];
         } else {
-            require(block.number >= conf.finalTime, "Raffle: NOT_PRIZE"); 
+            require(block.timestamp >= conf.finalTime, "Raffle: NOT_PRIZE"); 
             _safeTransferFrom(ring, address(this), msg.sender, item.balance);
             emit Lose(_eventId, _landId, item.user, item.balance, item.subAddr);
             delete lands[_eventId][_landId];
