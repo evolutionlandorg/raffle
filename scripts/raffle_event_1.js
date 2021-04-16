@@ -17,8 +17,8 @@ const Supervisor = {
 }
 
 const Raffle = {
-  "base58": "TMLTQdsTLvPGuaWGARTxaBrAW3EQpL3Bmt",
-	"hex": "417cae250f72d8dd014f62524d2384044824457130"
+  "base58": "TEHsUW5nSMFHmJJtQBZedmr3yAMpZEJHMR",
+	"hex": "412f681b31743cb2b92f47d30d8cde9cfb1b7cfa66"
 }
 
 const app = async () => {
