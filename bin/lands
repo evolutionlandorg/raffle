@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -e
+
+. $(PWD)/bin/init
+
+
+export LAND2=0x2a010001010001010000000000000001000000000000000000000000000002cd
+
+seth call $RAFFLE_PROXY "check(uint256)(bool)" $LAND2
+
+eventId=$(seth --to-uint256 2)
+seth call $RAFFLE_PROXY "lands(uint256,uint256)(address,uint256,address)" $eventId $LAND2 
+
