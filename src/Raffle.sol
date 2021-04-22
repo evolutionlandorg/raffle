@@ -64,8 +64,6 @@ contract Raffle is DSStop, DSMath {
     }
 
     constructor(address _registry, address _supervisor, uint256 _fromLandId) public {
-        owner = msg.sender;
-        emit LogSetOwner(msg.sender);
         registry = ISettingsRegistry(_registry);
         supervisor = _supervisor;
         fromLandId = _fromLandId;

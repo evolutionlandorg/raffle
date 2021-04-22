@@ -1,4 +1,5 @@
 // hevm: flattened sources of src/Raffle.sol
+
 pragma solidity =0.6.0;
 
 ////// lib/ds-math/src/math.sol
@@ -92,7 +93,6 @@ contract DSMath {
 }
 
 ////// lib/ds-stop/lib/ds-auth/src/auth.sol
-// SPDX-License-Identifier: GNU-3
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -256,7 +256,6 @@ interface IERC223 {
 }
 
 ////// src/interfaces/IERC721.sol
-// SPDX-License-Identifier: MIT
 
 /* pragma solidity ^0.6.7; */
 
@@ -381,8 +380,6 @@ contract Raffle is DSStop, DSMath {
     }
 
     constructor(address _registry, address _supervisor, uint256 _fromLandId) public {
-        owner = msg.sender;
-        emit LogSetOwner(msg.sender);
         registry = ISettingsRegistry(_registry);
         supervisor = _supervisor;
         fromLandId = _fromLandId;
