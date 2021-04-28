@@ -5,6 +5,7 @@ import (
 	"math/big"
 )
 
+// lands need be sorted by `sort.Strings(lands)`
 func Pick(lands []string, hash *big.Int) string {
 	length := int64(len(lands))
 	if length == 0 {
