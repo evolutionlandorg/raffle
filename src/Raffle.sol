@@ -77,13 +77,6 @@ contract Raffle is Initializable, DSStop, DSMath {
         require(success && (data.length == 0 || abi.decode(data, (bool))), "Raffle: TRANSFERFROM_FAILED");
     }
     
-    // check the land is valid
-    function check(uint256 _landId) view public returns (bool) {
-        address landrs = registry.addressOf(CONTRACT_LAND_RESOURCE);
-        ( , , , , uint256 totalMiners, ) = ILandResource(landrs).land2ResourceMineState(_landId);
-        return totalMiners == 0;
-    }
-
     /**
     @notice This function is used to join Gold Rust event through ETH/ERC20 Tokens
     @param _eventId event id which to join
@@ -194,7 +187,6 @@ contract Raffle is Initializable, DSStop, DSMath {
             //TODO:: check Data
             require(block.timestamp >= conf.finalTime && block.timestamp < conf.expireTime, "Raffle: NOT_PRIZE OR EXPIRATION"); 
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
-            require(check(_landId), "Raffle: INVALID_LAND");
             // return land to eve (genesisHolder)
             _safeTransferFrom(ownership, msg.sender, 0xfE3EE13c28830F7F91Bbb62305D3B616e49998EC, _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
