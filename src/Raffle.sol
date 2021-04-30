@@ -14,6 +14,8 @@ contract Raffle is DSStop, DSMath {
     event Exit(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount);
     event Win(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr, uint256 fromLandId, uint256 toLandId);
     event Lose(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr);
+    event SetEvent(uint256 indexed eventId, uint256 start, uint256 end, uint256 finalTime, uint256 expire, uint256 toLandId);
+
     // 0x434f4e54524143545f4f424a4543545f4f574e45525348495000000000000000
     bytes32 public constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
     // 0x434f4e54524143545f52494e475f45524332305f544f4b454e00000000000000
@@ -74,13 +76,6 @@ contract Raffle is DSStop, DSMath {
         require(success && (data.length == 0 || abi.decode(data, (bool))), "Raffle: TRANSFERFROM_FAILED");
     }
     
-    // check the land is valid
-    function check(uint256 _landId) view public returns (bool) {
-        address landrs = registry.addressOf(CONTRACT_LAND_RESOURCE);
-        ( , , , , uint256 totalMiners, ) = ILandResource(landrs).land2ResourceMineState(_landId);
-        return totalMiners == 0;
-    }
-
     /**
     @notice This function is used to join Gold Rust event through ETH/ERC20 Tokens
     @param _eventId event id which to join
@@ -191,7 +186,6 @@ contract Raffle is DSStop, DSMath {
             //TODO:: check Data
             require(block.timestamp >= conf.finalTime && block.timestamp < conf.expireTime, "Raffle: NOT_PRIZE OR EXPIRATION"); 
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
-            require(check(_landId), "Raffle: INVALID_LAND");
             // return land to eve
             _safeTransferFrom(ownership, msg.sender, 0x96C53Cc5B77b6ef212C3db360DD3d4D33516787a, _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
@@ -217,6 +211,7 @@ contract Raffle is DSStop, DSMath {
             expireTime: _expire,
             toLandId: _toLandId
         });
+        emit SetEvent(_eventId, events[_eventId].startTime, events[_eventId].endTime, events[_eventId].finalTime, events[_eventId].expireTime, events[_eventId].toLandId);
     }
 
     function _verify(bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
