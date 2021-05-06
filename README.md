@@ -28,7 +28,7 @@ Redeem prize after lottery
 #### Ropsten
 ```json
 {
-  "RAFFLE_PROXY": "0xD6043B6f1Bc85Ab687d5d3f21ecBa22998b2a1CD"
+  "RAFFLE_PROXY": "0x005d5D8D31078e3E3cdaE300BfDc11F6327a189E"
 }
 ```
 
