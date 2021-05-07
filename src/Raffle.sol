@@ -118,7 +118,7 @@ contract Raffle is DSStop, DSMath {
             IERC20(ring).transferFrom(msg.sender, address(this), diff);
         } else {
             diff = sub(item.balance, _amount);
-            IERC20(ring).transferFrom(address(this), msg.sender, diff);
+            IERC20(ring).transfer(msg.sender, diff);
         }
         item.balance = _amount;
         emit ChangeAmount(_eventId, _landId, item.user, item.balance);
