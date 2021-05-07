@@ -39,8 +39,8 @@ Redeem prize after lottery
 ```json
 {
   "Raffle": {
-  	"base58": "TXA3qBwvx4VaeJbLcKNwHvEKewNb8sQCgN",
-	"hex": "41e8678fea8bbce8577ce7ea430aa0da7f38ad9b8c"
+  	"base58": "TXJnfPHxynNqcXjyebprA14dpLGS87h9eU",
+	"hex": "41ea0ea4b2a3d745597153f67d438b58e729189b11"
   } 
 }
 ```
