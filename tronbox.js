@@ -44,7 +44,7 @@ Then, run the migration with:
     },
     compilers: {
       solc: {
-        version: '0.6.0'
+        version: '0.4.25'
       }
     }
   },
@@ -53,6 +53,6 @@ Then, run the migration with:
       enabled: true, // default: false, true: enable solc optimize
       runs: 200
     },
-    evmVersion: 'istanbul'
+    evmVersion: 'byzantium'
   }
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.6.7;
+pragma solidity =0.4.24;
 
 interface ISettingsRegistry {
     function uintOf(bytes32 _propertyName) external view returns (uint256);
@@ -15,11 +15,11 @@ interface ISettingsRegistry {
 
     function setUintProperty(bytes32 _propertyName, uint _value) external;
 
-    function setStringProperty(bytes32 _propertyName, string calldata _value) external;
+    function setStringProperty(bytes32 _propertyName, string _value) external;
 
     function setAddressProperty(bytes32 _propertyName, address _value) external;
 
-    function setBytesProperty(bytes32 _propertyName, bytes calldata _value) external;
+    function setBytesProperty(bytes32 _propertyName, bytes _value) external;
 
     function setBoolProperty(bytes32 _propertyName, bool _value) external;
 

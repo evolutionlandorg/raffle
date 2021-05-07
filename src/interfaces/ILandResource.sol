@@ -1,4 +1,4 @@
-pragma solidity ^0.6.7;
+pragma solidity =0.4.24;
 
 interface ILandResource {
     function land2ResourceMineState(uint256 landId) external view returns (uint256,uint256,uint256,uint256,uint256,uint256);

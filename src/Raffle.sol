@@ -1,9 +1,10 @@
-pragma solidity ^0.6.7;
+pragma solidity =0.4.24;
 
 import "ds-math/math.sol";
 import "ds-stop/stop.sol";
 import "./interfaces/ISettingsRegistry.sol";
 import "./interfaces/ILandResource.sol";
+import "./interfaces/IERC20.sol";
 import "./interfaces/IERC223.sol";
 import "./interfaces/IERC721.sol";
 
@@ -24,7 +25,6 @@ contract Raffle is DSStop, DSMath {
     bytes32 public constant CONTRACT_LAND_RESOURCE = "CONTRACT_LAND_RESOURCE";
     // 0x434f4e54524143545f524556454e55455f504f4f4c0000000000000000000000
     bytes32 public constant CONTRACT_REVENUE_POOL = "CONTRACT_REVENUE_POOL";
-    bytes4 private constant _SELECTOR_TRANSFERFROM = bytes4(keccak256(bytes("transferFrom(address,address,uint256)")));
     // Join Gold Rush Event minimum RING amount
     uint256 public constant MINI_AMOUNT = 1e18; 
 
@@ -71,11 +71,6 @@ contract Raffle is DSStop, DSMath {
         fromLandId = _fromLandId;
     }
 
-    function _safeTransferFrom(address token, address from, address to, uint256 value) private {
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(_SELECTOR_TRANSFERFROM, from, to, value)); // solhint-disable-line
-        require(success && (data.length == 0 || abi.decode(data, (bool))), "Raffle: TRANSFERFROM_FAILED");
-    }
-    
     /**
     @notice This function is used to join Gold Rust event through ETH/ERC20 Tokens
     @param _eventId event id which to join
@@ -88,10 +83,7 @@ contract Raffle is DSStop, DSMath {
         require(msg.sender == IERC721(ownership).ownerOf(_landId), "Raffle: FORBIDDEN");
         require(lands[_eventId][_landId].user == address(0), "Raffle: NOT_EMPTY");
         require(_amount >= MINI_AMOUNT, "Raffle: TOO_SMALL");
-        {
-            address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
-            _safeTransferFrom(ring, msg.sender, address(this), _amount);
-        }
+        IERC20(registry.addressOf(CONTRACT_RING_ERC20_TOKEN)).transferFrom(msg.sender, address(this), _amount);
         lands[_eventId][_landId] = Item({
             user: msg.sender,
             balance: _amount,
@@ -100,7 +92,7 @@ contract Raffle is DSStop, DSMath {
         emit Join(_eventId, _landId, msg.sender, _amount, _subAddr, fromLandId, events[_eventId].toLandId);
     }
 
-    function joins(uint256 _eventId, uint256[] calldata _landIds, uint256[] calldata _amounts, address[] calldata _subAddrs) external {
+    function joins(uint256 _eventId, uint256[] _landIds, uint256[] _amounts, address[] _subAddrs) external {
         require(_landIds.length == _amounts.length && _landIds.length == _subAddrs.length, "Raffle: INVALID_LENGTH");
         for(uint256 i = 0; i < _landIds.length; i++) {
             join(_eventId, _landIds[i], _amounts[i], _subAddrs[i]);
@@ -120,12 +112,13 @@ contract Raffle is DSStop, DSMath {
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         require(item.balance != _amount, "Raffle: SAME_AMOUNT");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
+        uint256 diff = 0;
         if (_amount > item.balance) {
-            uint256 diff = sub(_amount, item.balance);
-            _safeTransferFrom(ring, msg.sender, address(this), diff);
+            diff = sub(_amount, item.balance);
+            IERC20(ring).transferFrom(msg.sender, address(this), diff);
         } else {
-            uint256 diff = sub(item.balance, _amount);
-            _safeTransferFrom(ring, address(this), msg.sender, diff);
+            diff = sub(item.balance, _amount);
+            IERC20(ring).transferFrom(address(this), msg.sender, diff);
         }
         item.balance = _amount;
         emit ChangeAmount(_eventId, _landId, item.user, item.balance);
@@ -166,7 +159,7 @@ contract Raffle is DSStop, DSMath {
         Item storage item = lands[_eventId][_landId];
         require(item.user == msg.sender, "Raffle: FORBIDDEN");
         address ring = registry.addressOf(CONTRACT_RING_ERC20_TOKEN);
-        _safeTransferFrom(ring, address(this), msg.sender, item.balance);
+        IERC20(ring).transfer(msg.sender, item.balance);
         emit Exit(_eventId, _landId, item.user, item.balance);
         delete lands[_eventId][_landId];
     }
@@ -187,13 +180,13 @@ contract Raffle is DSStop, DSMath {
             require(block.timestamp >= conf.finalTime && block.timestamp < conf.expireTime, "Raffle: NOT_PRIZE OR EXPIRATION"); 
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
             // return land to eve
-            _safeTransferFrom(ownership, msg.sender, 0x96C53Cc5B77b6ef212C3db360DD3d4D33516787a, _landId);
+            IERC721(ownership).transferFrom(msg.sender, 0x96C53Cc5B77b6ef212C3db360DD3d4D33516787a, _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
             emit Win(_eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, conf.toLandId);
             delete lands[_eventId][_landId];
         } else {
             require(block.timestamp >= conf.finalTime, "Raffle: NOT_PRIZE"); 
-            _safeTransferFrom(ring, address(this), msg.sender, item.balance);
+            IERC20(ring).transfer(msg.sender, item.balance);
             emit Lose(_eventId, _landId, item.user, item.balance, item.subAddr);
             delete lands[_eventId][_landId];
         }

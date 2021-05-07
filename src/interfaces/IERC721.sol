@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.7;
+pragma solidity =0.4.24;
 
 interface IERC721 {
     function balanceOf(address owner) external view returns (uint256 balance);
@@ -11,5 +11,5 @@ interface IERC721 {
     function getApproved(uint256 tokenId) external view returns (address operator);
     function setApprovalForAll(address operator, bool _approved) external;
     function isApprovedForAll(address owner, address operator) external view returns (bool);
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external;
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes data) external;
 }
