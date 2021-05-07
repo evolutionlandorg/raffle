@@ -16,6 +16,7 @@ contract Raffle is Initializable, DSStop, DSMath {
     event Exit(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount);
     event Win(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr, uint256 fromLandId, uint256 toLandId);
     event Lose(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr);
+    event SetEvent(uint256 indexed eventId, uint256 startTime, uint256 endTime, uint256 finalTime, uint256 expireTime, uint256 toLandId);
     // 0x434f4e54524143545f4f424a4543545f4f574e45525348495000000000000000
     bytes32 public constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
     // 0x434f4e54524143545f52494e475f45524332305f544f4b454e00000000000000
@@ -207,6 +208,7 @@ contract Raffle is Initializable, DSStop, DSMath {
             expireTime: _expire,
             toLandId: _toLandId
         });
+        emit SetEvent(_eventId, events[_eventId].startTime, events[_eventId].endTime, events[_eventId].finalTime, events[_eventId].expireTime, events[_eventId].toLandId);
     }
 
     function _verify(bytes32 _hashmessage, uint8 _v, bytes32 _r, bytes32 _s) internal pure returns (address) {
