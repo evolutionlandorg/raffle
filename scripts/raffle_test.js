@@ -6,16 +6,6 @@ const tronWeb = new TronWeb({
     privateKey: process.env.PRIVATE_KEY_SHASTA
 })
 
-const SettingsRegistry = {
-  base58: "TV7XzfAcDrcpFmRkgCh2gg8wf15Cz9764W",
-  hex: "41d1fd927d8bf55bff2dfb8248047bc9881e710cc7"
-}
-
-const Supervisor = {
-  base58: "TA2YGCFuifxkJrkRrnKbugQF5ZVkJzkk4p",
-  hex: "4100A1537D251A6A4C4EFFAB76948899061FEA47B9"
-}
-
 const Raffle = {
  	"base58": "THcjnVV6R6ipwkBUy88prmgVsac55UWYje",
 	"hex": "4153e1f7bb25bacfe7fec16e8d2dcedcaa99d9571c"
@@ -30,48 +20,37 @@ const abi = [
           "type": "uint256"
         },
         {
-          "name": "_toLandId",
+          "name": "_landId",
           "type": "uint256"
         },
         {
-          "name": "_start",
+          "name": "_amount",
           "type": "uint256"
         },
         {
-          "name": "_end",
-          "type": "uint256"
-        },
-        {
-          "name": "_final",
-          "type": "uint256"
-        },
-        {
-          "name": "_expire",
-          "type": "uint256"
+          "name": "_subAddr",
+          "type": "address"
         }
       ],
-      "name": "setEvent",
+      "name": "join",
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
-    }
+    },
 ]
 
+let params = {
+  feeLimit:1000000000,
+  callValue: 1000,
+  shouldPollResponse:true
+}
 const app = async () => {
   tronWeb.setDefaultBlock('latest');
+  let land = "0x2a02000102000101000000000000000200000000000000000000000000000133"
+  let amount = "2000000000000000000";
   let raffle = await tronWeb.contract(abi, Raffle.hex);
-  let eventId=1
-  let toLandId=3
-  let startBlock=1620272023
-  let endBlock=1620587755
-  let finalBlock=1620674155
-  let expireBlock=1628622955
-  let ret = await raffle.setEvent(eventId, toLandId, startBlock, endBlock, finalBlock, expireBlock).send({
-      feeLimit:1e8,
-      callValue:0,
-      shouldPollResponse:true
-  })
+  let ret = await raffle.join(1, land, amount, Raffle.hex).send(params)
   console.log(ret)
   console.log("finished");
 };

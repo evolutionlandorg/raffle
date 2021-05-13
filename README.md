@@ -29,11 +29,16 @@ Redeem prize after lottery
 ### Addresses
 
 #### Tron shasta
+
 ```json
 {
   "Raffle": {
-  	"base58": "TEdKu2pfHC82yjhACMT45jAW6MXZN7DEMd",
-	"hex": "41331610f5b595ea4265fbc4d20cd6ab67e851c6f1"
+  	"base58": "TDoKYLbAmC9CLiD2D6Y6woaNTuPpB8cZzP",
+	"hex": "412a01cd606796d1b75aab86b52cab92d21060d0cc"
+  }, 
+  "RaffleProxy": {
+  	"base58": "THcjnVV6R6ipwkBUy88prmgVsac55UWYje",
+	"hex": "4153e1f7bb25bacfe7fec16e8d2dcedcaa99d9571c"
   } 
 }
 ```

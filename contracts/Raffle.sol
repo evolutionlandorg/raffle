@@ -377,6 +377,7 @@ contract Raffle is DSStop, DSMath {
         uint256 toLandId;
     }
 
+    bool private singletonLock = false;
     // Gold Rush begin from start block
     ISettingsRegistry public registry;
     address public supervisor;
@@ -394,7 +395,17 @@ contract Raffle is DSStop, DSMath {
        _;
     }
 
-    constructor(address _registry, address _supervisor, uint256 _fromLandId) public {
+    modifier singletonLockCall() {
+        require(!singletonLock, "Only can call once");
+        _;
+        singletonLock = true;
+    }
+
+    function initializeContract(address _registry, address _supervisor, uint256 _fromLandId) public singletonLockCall {
+        // Ownable constructor
+        owner = msg.sender;
+        emit LogSetOwner(msg.sender);
+
         registry = ISettingsRegistry(_registry);
         supervisor = _supervisor;
         fromLandId = _fromLandId;

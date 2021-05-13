@@ -347,6 +347,11 @@
     "@ethersproject/properties" "^5.1.0"
     "@ethersproject/strings" "^5.1.0"
 
+"@evolutionland/upgraeability-using-unstructured-storage@^0.1.1":
+  "integrity" "sha512-YmoEWnLsMhD3P348AsHcTtugKr67yDrDVfpj4tOetQlB25KiY/xbnBSZtWDKCRsreum84rTjp5YZ75avqW0CKg=="
+  "resolved" "https://registry.npmjs.org/@evolutionland/upgraeability-using-unstructured-storage/-/upgraeability-using-unstructured-storage-0.1.1.tgz"
+  "version" "0.1.1"
+
 "aes-js@3.0.0":
   "integrity" "sha1-4h3xCtbCBTKVvLuNq0Cwnb6ofk0="
   "resolved" "https://registry.npmjs.org/aes-js/-/aes-js-3.0.0.tgz"
