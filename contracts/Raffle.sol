@@ -390,8 +390,7 @@ contract Raffle is DSStop, DSMath {
 
 
     modifier duration(uint256 _eventId) {
-        Conf storage conf = events[_eventId];
-       require(block.timestamp >= conf.startTime && block.timestamp < conf.endTime, "Raffle: NOT_DURATION"); 
+       require(block.timestamp >= events[_eventId].startTime && block.timestamp < events[_eventId].endTime, "Raffle: NOT_DURATION"); 
        _;
     }
 

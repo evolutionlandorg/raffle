@@ -17,8 +17,8 @@ const Supervisor = {
 }
 
 const Raffle = {
- 	"base58": "THcjnVV6R6ipwkBUy88prmgVsac55UWYje",
-	"hex": "4153e1f7bb25bacfe7fec16e8d2dcedcaa99d9571c"
+ 	"base58": "TBccQWiATG3xH89J9Brqp8HiyGeZDDPtgg",
+	"hex": "41120b0da92df26b7cd5de70e24ed47fffde916c1c"
 }
 
 const abi = [
