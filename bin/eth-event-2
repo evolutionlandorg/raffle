@@ -5,7 +5,7 @@ set -e
 . $(PWD)/bin/init
 
 eventId=2
-toLandId=4
+toLandId=3
 startBlock=1623997800
 endBlock=1624329600
 finalBlock=1624330200
