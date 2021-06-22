@@ -5,7 +5,7 @@ import "ds-stop/stop.sol";
 import "./interfaces/ISettingsRegistry.sol";
 import "./interfaces/ILandResource.sol";
 import "./interfaces/IERC20.sol";
-import "./interfaces/IERC223.sol";
+import "./interfaces/ITRC223.sol";
 import "./interfaces/IERC721.sol";
 
 contract Raffle is DSStop, DSMath {
@@ -181,7 +181,7 @@ contract Raffle is DSStop, DSMath {
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
             // return land to eve
             IERC721(ownership).transferFrom(msg.sender, 0x96C53Cc5B77b6ef212C3db360DD3d4D33516787a, _landId);
-            IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
+            ITRC223(ring).transferAndFallback(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
             emit Win(_eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, conf.toLandId);
             delete lands[_eventId][_landId];
         } else {

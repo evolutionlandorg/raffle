@@ -17,19 +17,19 @@ const Supervisor = {
 }
 
 const Raffle = {
-  "base58": "TEdKu2pfHC82yjhACMT45jAW6MXZN7DEMd",
-	"hex": "41331610f5b595ea4265fbc4d20cd6ab67e851c6f1"
+  "base58": "TYckgaNb2byLvuwqY6JaCgpbDECcKBbo7H",
+	"hex": "41F86C9AA48102D61943789A07E0C97EB8D923436B"
 }
 
 const app = async () => {
   tronWeb.setDefaultBlock('latest');
   let raffle = await tronWeb.contract().at(Raffle.hex);
   let eventId=1
-  let toLandId=3
-  let startBlock=1620272023
-  let endBlock=1620587755
-  let finalBlock=1620674155
-  let expireBlock=1628622955
+  let toLandId=4
+  let startBlock=1624339800
+  let endBlock=1624345200
+  let finalBlock=1624345800
+  let expireBlock=1624348800
   let ret = await raffle.setEvent(eventId, toLandId, startBlock, endBlock, finalBlock, expireBlock).send({
       feeLimit:1e8,
       callValue:0,
