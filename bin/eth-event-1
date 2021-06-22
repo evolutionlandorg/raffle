@@ -6,9 +6,9 @@ set -e
 eventId=1
 toLandId=4
 startBlock=1624339800
-endBlock=1624345200
-finalBlock=1624345800
-expireBlock=1624348800
+endBlock=1624350600
+finalBlock=1624351200
+expireBlock=1624354200
 seth send $RAFFLE_PROXY "setEvent(uint256,uint256,uint256,uint256,uint256,uint256)" $eventId $toLandId $startBlock $endBlock $finalBlock $expireBlock
 
 
