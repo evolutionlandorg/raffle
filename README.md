@@ -41,3 +41,20 @@ Redeem prize after lottery
   } 
 }
 ```
+
+#### Mainnet
+```json
+{
+  "RAFFLE_PROXY": "0x56746a8099a7e6D962802A23e01FeDdc1282cDAe"
+}
+```
+
+#### Tron shasta
+```json
+{
+  "Raffle": {
+  	"base58": "TAkDMgTFMPsRPiy43ZoFRpGjSPNTpqZCeg",
+	"hex": "41088303DC5304E273A5A838B4BB9B9645D737EE0E"
+  } 
+}
+```
