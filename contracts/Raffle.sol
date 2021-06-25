@@ -515,7 +515,7 @@ contract Raffle is DSStop, DSMath {
             delete lands[_eventId][_landId];
         } else {
             require(block.timestamp >= conf.finalTime, "Raffle: NOT_PRIZE"); 
-            IERC20(ring).transfer(msg.sender, item.balance);
+            IERC20(ring).transfer(item.user, item.balance);
             emit Lose(_eventId, _landId, item.user, item.balance, item.subAddr);
             delete lands[_eventId][_landId];
         }
