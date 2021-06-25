@@ -21,8 +21,8 @@ contract Raffle is Initializable, DSStop, DSMath {
     bytes32 public constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
     // 0x434f4e54524143545f52494e475f45524332305f544f4b454e00000000000000
     bytes32 public constant CONTRACT_RING_ERC20_TOKEN = "CONTRACT_RING_ERC20_TOKEN";
-    // 0x434f4e54524143545f4c414e445f5245534f5552434500000000000000000000
-    bytes32 public constant CONTRACT_LAND_RESOURCE = "CONTRACT_LAND_RESOURCE";
+    //0x434f4e54524143545f47454e455349535f484f4c444552000000000000000000
+    bytes32 public constant CONTRACT_GENESIS_HOLDER = "CONTRACT_GENESIS_HOLDER";
     // 0x434f4e54524143545f524556454e55455f504f4f4c0000000000000000000000
     bytes32 public constant CONTRACT_REVENUE_POOL = "CONTRACT_REVENUE_POOL";
     // Join Gold Rush Event minimum RING amount
@@ -184,13 +184,13 @@ contract Raffle is Initializable, DSStop, DSMath {
             require(block.timestamp >= conf.finalTime && block.timestamp < conf.expireTime, "Raffle: NOT_PRIZE OR EXPIRATION"); 
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
             // return land to eve (genesisHolder)
-            IERC721(ownership).transferFrom(msg.sender, 0xfE3EE13c28830F7F91Bbb62305D3B616e49998EC, _landId);
+            IERC721(ownership).transferFrom(msg.sender, registry.addressOf(CONTRACT_GENESIS_HOLDER), _landId);
             IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
             emit Win(_eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, conf.toLandId);
             delete lands[_eventId][_landId];
         } else {
             require(block.timestamp >= conf.finalTime, "Raffle: NOT_PRIZE"); 
-            IERC20(ring).transfer(msg.sender, item.balance);
+            IERC20(ring).transfer(item.user, item.balance);
             emit Lose(_eventId, _landId, item.user, item.balance, item.subAddr);
             delete lands[_eventId][_landId];
         }
