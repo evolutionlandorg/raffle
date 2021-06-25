@@ -27,9 +27,9 @@ const app = async () => {
   let eventId=1
   let toLandId=4
   let startBlock=1624510800
-  let endBlock=1624516200
-  let finalBlock=1624516800
-  let expireBlock=1624519800
+  let endBlock=1624524000
+  let finalBlock=1624524600
+  let expireBlock=1624527000
   let ret = await raffle.setEvent(eventId, toLandId, startBlock, endBlock, finalBlock, expireBlock).send({
       feeLimit:1e8,
       callValue:0,
