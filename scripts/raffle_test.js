@@ -7,8 +7,8 @@ const tronWeb = new TronWeb({
 })
 
 const Raffle = {
- 	"base58": "TBccQWiATG3xH89J9Brqp8HiyGeZDDPtgg",
-	"hex": "41120b0da92df26b7cd5de70e24ed47fffde916c1c"
+ 	"base58": "TX67FoajBX2X5x1qztS4fvwmwwVWhSFwPi",
+	"hex": "41e7a8c1c181e6ab2d4e472ec429749ebfb42af970"
 }
 
 const abi = [

@@ -17,11 +17,46 @@ const Supervisor = {
 }
 
 const Raffle = {
- 	"base58": "TBccQWiATG3xH89J9Brqp8HiyGeZDDPtgg",
-	"hex": "41120b0da92df26b7cd5de70e24ed47fffde916c1c"
+ 	"base58": "TX67FoajBX2X5x1qztS4fvwmwwVWhSFwPi",
+	"hex": "41e7a8c1c181e6ab2d4e472ec429749ebfb42af970"
 }
 
 const abi = [
+      {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "events",
+      "outputs": [
+        {
+          "name": "startTime",
+          "type": "uint256"
+        },
+        {
+          "name": "endTime",
+          "type": "uint256"
+        },
+        {
+          "name": "finalTime",
+          "type": "uint256"
+        },
+        {
+          "name": "expireTime",
+          "type": "uint256"
+        },
+        {
+          "name": "toLandId",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
     {
       "constant": false,
       "inputs": [
@@ -62,16 +97,17 @@ const app = async () => {
   tronWeb.setDefaultBlock('latest');
   let raffle = await tronWeb.contract(abi, Raffle.hex);
   let eventId=1
-  let toLandId=3
-  let startBlock=1620272023
-  let endBlock=1620587755
-  let finalBlock=1620674155
-  let expireBlock=1628622955
-  let ret = await raffle.setEvent(eventId, toLandId, startBlock, endBlock, finalBlock, expireBlock).send({
-      feeLimit:1e8,
-      callValue:0,
-      shouldPollResponse:true
-  })
+  let ret = await raffle.events(1).call()
+  // let toLandId=3
+  // let startBlock=1620272023
+  // let endBlock=1620587755
+  // let finalBlock=1620674155
+  // let expireBlock=1628622955
+  // let ret = await raffle.setEvent(eventId, toLandId, startBlock, endBlock, finalBlock, expireBlock).send({
+  //     feeLimit:1e8,
+  //     callValue:0,
+  //     shouldPollResponse:true
+  // })
   console.log(ret)
   console.log("finished");
 };
