@@ -7,8 +7,8 @@ const tronWeb = new TronWeb({
 })
 
 const Raffle = {
- 	"base58": "TX67FoajBX2X5x1qztS4fvwmwwVWhSFwPi",
-	"hex": "41e7a8c1c181e6ab2d4e472ec429749ebfb42af970"
+ 	"base58": "TVshkqR34hD6pdveeBEfEybCpTYCUwru56",
+	"hex": "41da5805eee3a47c43792f319ea8d66b88c3f20d5a"
 }
 
 const abi = [
@@ -56,7 +56,7 @@ const abi = [
 
 let params = {
   feeLimit:1000000000,
-  callValue: 1000,
+  callValue: 0,
   shouldPollResponse:true
 }
 const app = async () => {

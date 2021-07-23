@@ -400,6 +400,11 @@ contract Raffle is DSStop, DSMath {
         singletonLock = true;
     }
 
+    function getEvent(uint256 i) public view returns (uint256, uint256, uint256, uint256, uint256) {
+        Conf memory conf = events[i];
+        return (conf.startTime, conf.endTime, conf.finalTime, conf.expireTime, conf.toLandId);
+    }
+
     function initializeContract(address _registry, address _supervisor, uint256 _fromLandId) public singletonLockCall {
         // Ownable constructor
         owner = msg.sender;
