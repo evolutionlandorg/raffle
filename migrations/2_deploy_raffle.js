@@ -19,8 +19,8 @@ const tronWeb = new TronWeb({
 })
 
 let params = {
-  feeLimit:1000000000,
-  callValue: 1000,
+  feeLimit: 1e8,
+  callValue: 0,
   shouldPollResponse:true
 }
 
