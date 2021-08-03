@@ -49,7 +49,7 @@ Redeem prize after lottery
 }
 ```
 
-#### Tron shasta
+#### Tron 
 ```json
 {
   "Raffle": {
