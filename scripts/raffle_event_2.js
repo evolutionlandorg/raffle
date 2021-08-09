@@ -25,11 +25,11 @@ const app = async () => {
   tronWeb.setDefaultBlock('latest');
   let raffle = await tronWeb.contract().at(Raffle.hex);
   let eventId=2
-  let toLandId=3
-  let startBlock=1623997800
-  let endBlock=1624329600
-  let finalBlock=1624330200
-  let expireBlock=1624333800
+  let toLandId=5
+  let startBlock=1628560800
+  let endBlock=1629424800
+  let finalBlock=1629432000
+  let expireBlock=1630296000
   let ret = await raffle.setEvent(eventId, toLandId, startBlock, endBlock, finalBlock, expireBlock).send({
       feeLimit:1e8,
       callValue:0,
