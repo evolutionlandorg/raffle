@@ -58,3 +58,9 @@ Redeem prize after lottery
   } 
 }
 ```
+#### Heco
+```json
+{
+  "RAFFLE_PROXY": "0x6f75Dcd61579d9363799d282D6DD1f202295Ae84"
+}
+```
