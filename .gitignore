@@ -6,4 +6,5 @@ package-lock.json
 .dapprc
 .sethrc
 .env
+.DS_Store
 
