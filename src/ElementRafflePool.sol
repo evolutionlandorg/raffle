@@ -96,8 +96,11 @@ contract ElementRafflePool is Initializable, DSStop {
             uint256 tokenId = IERC721(ownership).tokenOfOwnerByIndex(self, i);
             if (IInterstellarEncoder(interstellarEncoder).getObjectClass(tokenId) == uint8(_objectClass)) {
                 IERC721(ownership).transferFrom(self, msg.sender, tokenId);
+                return;
             }
         }
+
+        revert("empty pool");
     }
 
     function _isContract(address _addr) internal view returns (bool) {
