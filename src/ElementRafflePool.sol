@@ -12,8 +12,6 @@ contract ElementRafflePool is Initializable, DSStop {
     event SmallDraw(address user, uint256 number, IInterstellarEncoder.ObjectClass class);
     event LargeDraw(address user, uint256 number, IInterstellarEncoder.ObjectClass class);
 
-    // 0x55494e545f454c454d454e545f524146464c455f464545000000000000000000
-    bytes32 public constant UINT_ELEMENT_RAFFLE_FEE = "UINT_ELEMENT_RAFFLE_FEE";
     // 0x434f4e54524143545f4c414e445f424153450000000000000000000000000000
     bytes32 public constant CONTRACT_LAND_BASE = "CONTRACT_LAND_BASE";
     //"0x434f4e54524143545f4f424a4543545f4f574e45525348495000000000000000"
