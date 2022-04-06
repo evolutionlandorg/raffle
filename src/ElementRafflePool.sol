@@ -14,9 +14,9 @@ contract ElementRafflePool is Initializable, DSStop {
 
     // 0x434f4e54524143545f4c414e445f424153450000000000000000000000000000
     bytes32 public constant CONTRACT_LAND_BASE = "CONTRACT_LAND_BASE";
-    //"0x434f4e54524143545f4f424a4543545f4f574e45525348495000000000000000"
+    // 0x434f4e54524143545f4f424a4543545f4f574e45525348495000000000000000
     bytes32 public constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
-    //"0x434f4e54524143545f494e5445525354454c4c41525f454e434f444552000000"
+    // 0x434f4e54524143545f494e5445525354454c4c41525f454e434f444552000000
     bytes32 public constant CONTRACT_INTERSTELLAR_ENCODER = "CONTRACT_INTERSTELLAR_ENCODER";
 
     ISettingsRegistry public registry;
@@ -100,9 +100,6 @@ contract ElementRafflePool is Initializable, DSStop {
         }
     }
 
-    /**
-     * @notice Check if an address is a contract
-     */
     function _isContract(address _addr) internal view returns (bool) {
         uint256 size;
         assembly {
