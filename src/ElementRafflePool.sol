@@ -42,7 +42,7 @@ contract ElementRafflePool is Initializable, DSStop {
         IERC20(element).transferFrom(msg.sender, address(this), SMALL_DRAW_FEE);
         address random = registry.addressOf(CONTRACT_RANDOM_CODEX);
         uint seed = _seed();
-        uint randomness = ICodexRandom(random).dn(seed, 1000)
+        uint randomness = ICodexRandom(random).dn(seed, 1000);
         if (randomness == 0) {
             _reward(IInterstellarEncoder.ObjectClass.LAND);
             emit SmallDraw(msg.sender, randomness, IInterstellarEncoder.ObjectClass.LAND);
@@ -58,7 +58,7 @@ contract ElementRafflePool is Initializable, DSStop {
         IERC20(element).transferFrom(msg.sender, address(this), LARGE_DRAW_FEE);
         address random = registry.addressOf(CONTRACT_RANDOM_CODEX);
         uint seed = _seed();
-        uint randomness = ICodexRandom(random).dn(seed, 100)
+        uint randomness = ICodexRandom(random).dn(seed, 100);
         if (randomness == 0) {
             _reward(IInterstellarEncoder.ObjectClass.LAND);
             emit LargeDraw(msg.sender, randomness, IInterstellarEncoder.ObjectClass.LAND);
@@ -86,7 +86,7 @@ contract ElementRafflePool is Initializable, DSStop {
                     gasleft(),
                     block.difficulty,
                     block.coinbase,
-                    block.gaslimit,
+                    block.gaslimit
                 )
             )
         );
