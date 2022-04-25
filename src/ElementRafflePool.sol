@@ -18,7 +18,7 @@ contract ElementRafflePool is Initializable, DSStop {
     bytes32 private constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
     bytes32 private constant CONTRACT_INTERSTELLAR_ENCODER = "CONTRACT_INTERSTELLAR_ENCODER";
 
-    uint256 public constant SMALL_DRAW_FEE = 20e18;
+    uint256 public constant SMALL_DRAW_FEE = 10e18;
     uint256 public constant LARGE_DRAW_FEE = 100e18;
 
     ISettingsRegistry public registry;
