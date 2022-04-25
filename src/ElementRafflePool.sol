@@ -104,7 +104,7 @@ contract ElementRafflePool is Initializable, DSStop {
             }
         }
 
-        revert("empty pool");
+        revert("nothing");
     }
 
     function _isContract(address _addr) internal view returns (bool) {
