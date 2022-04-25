@@ -6,6 +6,5 @@ package-lock.json
 .dapprc
 .sethrc
 .env
-src/ElementRafflePool.sol
 
 
