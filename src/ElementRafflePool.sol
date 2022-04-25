@@ -96,7 +96,8 @@ contract ElementRafflePool is Initializable, DSStop {
         address self = address(this);
         address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
         address interstellarEncoder = registry.addressOf(CONTRACT_INTERSTELLAR_ENCODER);
-        for(uint i = 0; i < IERC721(ownership).balanceOf(self); i++) {
+        uint balance = IERC721(ownership).balanceOf(self);
+        for(uint i = 0; i < balance; i++) {
             uint256 tokenId = IERC721(ownership).tokenOfOwnerByIndex(self, i);
             if (IInterstellarEncoder(interstellarEncoder).getObjectClass(tokenId) == uint8(_objectClass)) {
                 IERC721(ownership).transferFrom(self, msg.sender, tokenId);
