@@ -18,8 +18,8 @@ contract ElementRafflePool is Initializable, DSStop {
     bytes32 private constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
     bytes32 private constant CONTRACT_INTERSTELLAR_ENCODER = "CONTRACT_INTERSTELLAR_ENCODER";
 
-    uint256 public constant SMALL_DRAW_FEE = 10e18;
-    uint256 public constant LARGE_DRAW_FEE = 100e18;
+    uint256 public smallDrawFee = 10e18;
+    uint256 public largeDrawFee = 100e18;
 
     ISettingsRegistry public registry;
     address public element;
@@ -38,8 +38,13 @@ contract ElementRafflePool is Initializable, DSStop {
         element = _element;
     }
 
+    function setFee(uint _smallDrawFee, uint _largeDrawFee) external auth {
+        smallDrawFee = _smallDrawFee;
+        largeDrawFee = _largeDrawFee;
+    }
+
     function smallDraw() notContract stoppable external {
-        IERC20(element).transferFrom(msg.sender, address(this), SMALL_DRAW_FEE);
+        IERC20(element).transferFrom(msg.sender, address(this), smallDrawFee);
         address random = registry.addressOf(CONTRACT_RANDOM_CODEX);
         uint seed = _seed();
         uint randomness = ICodexRandom(random).dn(seed, 1000);
@@ -55,7 +60,7 @@ contract ElementRafflePool is Initializable, DSStop {
     }
 
     function largeDraw() notContract stoppable external {
-        IERC20(element).transferFrom(msg.sender, address(this), LARGE_DRAW_FEE);
+        IERC20(element).transferFrom(msg.sender, address(this), largeDrawFee);
         address random = registry.addressOf(CONTRACT_RANDOM_CODEX);
         uint seed = _seed();
         uint randomness = ICodexRandom(random).dn(seed, 100);
