@@ -18,10 +18,13 @@ contract ElementRafflePool is Initializable, DSStop {
     bytes32 private constant CONTRACT_OBJECT_OWNERSHIP = "CONTRACT_OBJECT_OWNERSHIP";
     bytes32 private constant CONTRACT_INTERSTELLAR_ENCODER = "CONTRACT_INTERSTELLAR_ENCODER";
 
+    // small draw fee
     uint256 public smallDrawFee = 10e18;
+    // large draw fee
     uint256 public largeDrawFee = 100e18;
 
     ISettingsRegistry public registry;
+    // element token address
     address public element;
 
     modifier notContract() {
@@ -43,6 +46,8 @@ contract ElementRafflePool is Initializable, DSStop {
         largeDrawFee = _largeDrawFee;
     }
 
+    // do a small draw
+    // must approve `smallDrawFee` at least before draw
     function smallDraw() notContract stoppable external {
         IERC20(element).transferFrom(msg.sender, address(this), smallDrawFee);
         address random = registry.addressOf(CONTRACT_RANDOM_CODEX);
@@ -59,6 +64,8 @@ contract ElementRafflePool is Initializable, DSStop {
         }
     }
 
+    // do a large draw
+    // must approve `largeDrawFee` at least before draw
     function largeDraw() notContract stoppable external {
         IERC20(element).transferFrom(msg.sender, address(this), largeDrawFee);
         address random = registry.addressOf(CONTRACT_RANDOM_CODEX);
