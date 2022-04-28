@@ -82,6 +82,22 @@ contract ElementRafflePool is Initializable, DSStop {
         }
     }
 
+    // balanceOf this Lands and Apostles
+    function balanceOfEVO() public view returns (uint256 lands, uint apostles) {
+        address self = address(this);
+        address objectOwnership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
+        address interstellarEncoder = registry.addressOf(CONTRACT_INTERSTELLAR_ENCODER);
+        uint balance = IERC721(ownership).balanceOf(self);
+        for(uint i = 0; i < balance; i++) {
+            uint256 tokenId = ERC721(objectOwnership).tokenOfOwnerByIndex(self, i);
+            if (IInterstellarEncoder(interstellarEncoder).getObjectClass(tokenId) == uint8(IInterstellarEncoder.ObjectClass.LAND)) {
+                lands = lands.add(1);
+            } else if (IInterstellarEncoder(interstellarEncoder).getObjectClass(tokenId) == uint8(IInterstellarEncoder.ObjectClass.APOSTLE)) {
+                apostles = apostles.add(1);
+            }
+        }
+    }
+
     function isValidToken(address token) public view returns (bool) {
         uint index = ILandBase(registry.addressOf(CONTRACT_LAND_BASE)).resourceToken2RateAttrId(token);
         return index > 0;
