@@ -10,8 +10,8 @@ import "./interfaces/ICodexRandom.sol";
 import "./interfaces/IInterstellarEncoder.sol";
 
 contract ElementRafflePool is Initializable, DSStop {
-    event SmallDraw(address user, uint256 number, IInterstellarEncoder.ObjectClass class);
-    event LargeDraw(address user, uint256 number, IInterstellarEncoder.ObjectClass class);
+    event SmallDraw(address user, uint256 randomness, IInterstellarEncoder.ObjectClass clss);
+    event LargeDraw(address user, uint256 randomness, IInterstellarEncoder.ObjectClass clss);
 
     bytes32 private constant CONTRACT_LAND_BASE = "CONTRACT_LAND_BASE";
     bytes32 private constant CONTRACT_RANDOM_CODEX = "CONTRACT_RANDOM_CODEX";
