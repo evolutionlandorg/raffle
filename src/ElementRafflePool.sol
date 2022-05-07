@@ -19,9 +19,9 @@ contract ElementRafflePool is Initializable, DSStop {
     bytes32 private constant CONTRACT_INTERSTELLAR_ENCODER = "CONTRACT_INTERSTELLAR_ENCODER";
 
     // small draw fee
-    uint256 public smallDrawFee = 10e18;
+    uint256 public smallDrawFee;
     // large draw fee
-    uint256 public largeDrawFee = 100e18;
+    uint256 public largeDrawFee;
 
     ISettingsRegistry public registry;
     // element token address
@@ -39,6 +39,8 @@ contract ElementRafflePool is Initializable, DSStop {
         registry = ISettingsRegistry(_registry);
         require(isValidToken(_element), "Invalid element");
         element = _element;
+        smallDrawFee = 10e18;
+        largeDrawFee = 100e18;
     }
 
     function setFee(uint _smallDrawFee, uint _largeDrawFee) external auth {
