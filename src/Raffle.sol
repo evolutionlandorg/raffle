@@ -6,8 +6,8 @@ import "zeppelin-solidity/proxy/Initializable.sol";
 import "./interfaces/ISettingsRegistry.sol";
 import "./interfaces/ILandResource.sol";
 import "./interfaces/IERC20.sol";
-import "./interfaces/IERC223.sol";
 import "./interfaces/IERC721.sol";
+import "./interfaces/IRevenuePool.sol";
 
 contract Raffle is Initializable, DSStop, DSMath {
     event Join(uint256 indexed eventId, uint256 indexed landId, address user, uint256 amount, address subAddr, uint256 fromLandId, uint256 toLandId);
@@ -185,7 +185,9 @@ contract Raffle is Initializable, DSStop, DSMath {
             address ownership = registry.addressOf(CONTRACT_OBJECT_OWNERSHIP);
             // return land to eve (genesisHolder)
             IERC721(ownership).transferFrom(msg.sender, registry.addressOf(CONTRACT_GENESIS_HOLDER), _landId);
-            IERC223(ring).transfer(registry.addressOf(CONTRACT_REVENUE_POOL), item.balance, abi.encodePacked(bytes12(0), item.user));
+            address pool = registry.addressOf(CONTRACT_REVENUE_POOL);
+            IERC20(ring).approve(pool, item.balance);
+            IRevenuePool(pool).reward(ring, item.balance, item.user);
             emit Win(_eventId, _landId, item.user, item.balance, item.subAddr, fromLandId, conf.toLandId);
             delete lands[_eventId][_landId];
         } else {
